@@ -74,6 +74,20 @@ void Application::SetupRoom(void)
 	matrix4 deg180X = glm::rotate(glm::radians(180.0f), AXIS_X);
 	matrix4 degN90Y = glm::rotate(glm::radians(-90.0f), AXIS_Y);
 
+#pragma region Player
+	//Player
+
+	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Player");
+	v3Position = vector3(-5.5f, -1.1f, 13.0f);
+	m4Position = glm::translate(v3Position);
+	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
+	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->UsePhysicsSolver(false);
+#pragma endregion
+
+
+
+
 #pragma region 1st Row
 	//Desk
 	m_pEntityMngr->AddEntity("Stan\\Desk.obj", "Desk");
