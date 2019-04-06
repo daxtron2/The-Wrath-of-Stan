@@ -58,6 +58,7 @@ private:
 
 public:
 #pragma region Constructor / Run / Destructor
+	void SetupRoom(void);
 	/*
 	USAGE: Constructor
 	ARGUMENTS: ---
