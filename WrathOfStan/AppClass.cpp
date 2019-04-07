@@ -35,6 +35,8 @@ void Application::Update(void)
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
+	
+	Punch();
 }
 void Application::Display(void)
 {
@@ -64,6 +66,75 @@ void Application::Release(void)
 	ShutdownGUI();
 }
 
+void Application::Punch(void)
+{
+	matrix4 punchBox = glm::inverse(m_pCameraMngr->GetViewMatrix());
+	punchBox = punchBox * glm::scale(vector3(1, 1, 1));
+	//m_pMeshMngr->AddWireCubeToRenderList(punchBox, C_BLUE);
+
+	static MyEntity* punchEnt = nullptr;
+	if (punchEnt == nullptr)
+	{
+		int punchEntId = m_pEntityMngr->GetEntityIndex("Punch");
+		if (punchEntId != -1)
+		{
+			punchEnt = m_pEntityMngr->GetEntity(punchEntId);
+		}
+		else
+		{
+			m_pEntityMngr->AddEntity(new MyEntity(punchBox, "Punch"));
+			punchEnt = m_pEntityMngr->GetEntity();
+		}
+		punchEnt->GetRigidBody()->SetVisibleARBB(false);
+	}
+	else
+	{
+		punchEnt->SetModelMatrix(punchBox);
+	}
+
+	if (gui.m_bMousePressed[0] && m_bPunchedLastFrame == false)
+	{
+		m_bPunching = true;
+		m_bPunchedLastFrame = true;
+	}
+	else { m_bPunching = false; }
+
+	if (m_bPunching) 
+	{ 
+		std::cout << "Punching!" << std::endl; 
+		int colCount = punchEnt->GetCollidingCount();
+		if (colCount != 0)
+		{
+			uint entityCount = m_pEntityMngr->GetEntityCount();
+
+			int punchIndex = m_pEntityMngr->GetEntityIndex(punchEnt->GetUniqueID());
+
+			std::vector<MyEntity*> colEntities;
+
+			//needs a more optimal way to only get things collided with this
+			for (int i = 0; i < entityCount; i++)
+			{
+				if (i == punchIndex) continue;
+				MyEntity* temp = m_pEntityMngr->GetEntity(i);
+				//if (m_pEntityMngr->SharesDimension(punchEnt->GetUniqueID(), temp))
+				if(punchEnt->IsColliding(temp))
+				{
+					colEntities.push_back(temp);
+				}
+			}
+
+			for (int i = 0; i < colEntities.size(); i++)
+			{
+				vector3 otherPos = colEntities[i]->GetPosition();
+				vector3 playerPos = m_pCameraMngr->GetPosition();
+				vector3 punchDir = glm::normalize(otherPos - playerPos);
+				colEntities[i]->ApplyForce(punchDir * m_fPunchForce);
+				std::cout << "Punch Direction: " << punchDir.x << ", " << punchDir.y << ", " << punchDir.z << std::endl;
+			}
+		}
+	}
+}
+
 void Application::SetupRoom(void)
 {
 	vector3 v3Position = vector3(0.0f);
@@ -82,7 +153,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 
 
@@ -96,7 +167,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -105,7 +176,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -113,7 +184,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -122,7 +193,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -130,7 +201,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -140,7 +211,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -149,7 +220,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -158,7 +229,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -166,7 +237,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -176,7 +247,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -185,7 +256,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -193,7 +264,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -202,7 +273,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -210,7 +281,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -220,7 +291,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -229,7 +300,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -238,7 +309,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -246,7 +317,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Center Aisle
 
@@ -258,7 +329,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -267,7 +338,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -275,7 +346,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -284,7 +355,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -292,7 +363,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -302,7 +373,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -311,7 +382,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -320,7 +391,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -328,7 +399,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -338,7 +409,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -347,7 +418,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -355,7 +426,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -364,7 +435,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -372,7 +443,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -382,7 +453,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -391,7 +462,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -400,7 +471,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -408,7 +479,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 
 #pragma region 2nd Row
@@ -420,7 +491,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -429,7 +500,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -437,7 +508,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -446,7 +517,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -454,7 +525,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -464,7 +535,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -473,7 +544,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -482,7 +553,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -490,7 +561,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -500,7 +571,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -509,7 +580,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -517,7 +588,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -526,7 +597,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -534,7 +605,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -544,7 +615,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -553,7 +624,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -562,7 +633,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -570,7 +641,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Center Aisle
 
@@ -582,7 +653,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -591,7 +662,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -599,7 +670,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -608,7 +679,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -616,7 +687,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -626,7 +697,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -635,7 +706,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -644,7 +715,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -652,7 +723,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -662,7 +733,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -671,7 +742,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -679,7 +750,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -688,7 +759,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -696,7 +767,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -706,7 +777,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -715,7 +786,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -724,7 +795,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -732,7 +803,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 
 #pragma region 3rd Row
@@ -744,7 +815,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -753,7 +824,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -761,7 +832,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -770,7 +841,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -778,7 +849,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -788,7 +859,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -797,7 +868,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -806,7 +877,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -814,7 +885,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -824,7 +895,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -833,7 +904,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -841,7 +912,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -850,7 +921,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -858,7 +929,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -868,7 +939,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -877,7 +948,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -886,7 +957,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -894,7 +965,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Center Aisle
 
@@ -906,7 +977,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -915,7 +986,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -923,7 +994,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -932,7 +1003,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -940,7 +1011,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -950,7 +1021,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -959,7 +1030,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -968,7 +1039,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -976,7 +1047,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -986,7 +1057,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -995,7 +1066,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -1003,7 +1074,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -1012,7 +1083,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -1020,7 +1091,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -1030,7 +1101,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -1039,7 +1110,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -1048,7 +1119,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -1056,7 +1127,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 
 #pragma region 4th Row
@@ -1068,7 +1139,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -1077,7 +1148,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -1085,7 +1156,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -1094,7 +1165,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -1102,7 +1173,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -1112,7 +1183,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -1121,7 +1192,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -1130,7 +1201,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -1138,7 +1209,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -1148,7 +1219,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -1157,7 +1228,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -1165,7 +1236,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -1174,7 +1245,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -1182,7 +1253,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -1192,7 +1263,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -1201,7 +1272,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -1210,7 +1281,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -1218,7 +1289,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Center Aisle
 
@@ -1230,7 +1301,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -1239,7 +1310,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -1247,7 +1318,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -1256,7 +1327,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -1264,7 +1335,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -1274,7 +1345,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -1283,7 +1354,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -1292,7 +1363,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -1300,7 +1371,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Desk
 
@@ -1310,7 +1381,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Keyboards
 
@@ -1319,7 +1390,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Keyboard.obj", "Keyboard");
@@ -1327,7 +1398,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -1336,7 +1407,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Monitor.obj", "Monitor");
@@ -1344,7 +1415,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -1354,7 +1425,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Computer.obj", "Computer");
@@ -1363,7 +1434,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -1372,7 +1443,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 
 	m_pEntityMngr->AddEntity("Stan\\Chair.obj", "Chair");
@@ -1380,7 +1451,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 
 #pragma region Alberto Territory
@@ -1392,7 +1463,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(true/*m_bEnablePropPhysics*/);
 
 	//Keyboards
 
@@ -1401,7 +1472,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Monitors
 
@@ -1410,7 +1481,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Computer Towers
 
@@ -1420,7 +1491,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 
 	//Chairs
 
@@ -1429,7 +1500,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 
 #pragma region Back Desk
@@ -1441,6 +1512,6 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 }
