@@ -415,23 +415,42 @@ void Application::ProcessKeyboard(void)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		m_pCameraMngr->MoveForward(m_fMovementSpeed * fMultiplier);
+		//m_pCameraMngr->MoveForward(m_fMovementSpeed * fMultiplier);
+		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
+		player->SetPosition(vector3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.25f));
+		
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		m_pCameraMngr->MoveForward(-m_fMovementSpeed * fMultiplier);
+	{
+		//m_pCameraMngr->MoveForward(-m_fMovementSpeed * fMultiplier);
+		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
+		player->SetPosition(vector3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.25f));
+	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		m_pCameraMngr->MoveSideways(-m_fMovementSpeed * fMultiplier);
+	{
+		//m_pCameraMngr->MoveSideways(-m_fMovementSpeed * fMultiplier);
+		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
+		player->SetPosition(vector3(player->GetPosition().x - 0.25f, player->GetPosition().y, player->GetPosition().z));
+	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		m_pCameraMngr->MoveSideways(m_fMovementSpeed * fMultiplier);
+	{
+		//m_pCameraMngr->MoveSideways(m_fMovementSpeed * fMultiplier);
+		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
+		player->SetPosition(vector3(player->GetPosition().x + 0.25f, player->GetPosition().y, player->GetPosition().z));
+	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	{
 		m_pCameraMngr->MoveVertical(-m_fMovementSpeed * fMultiplier);
+	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+	{
 		m_pCameraMngr->MoveVertical(m_fMovementSpeed * fMultiplier);
+	}
 #pragma endregion
 }
 //Joystick
