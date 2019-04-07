@@ -6,9 +6,10 @@ void Application::InitVariables(void)
 
 	//Set the position and target of the camera
 	m_pCameraMngr->SetPositionTargetAndUpward(
-		vector3(-5.5f, 1.5f, 15.0f), //Position
+		vector3(0.0f, 7.0f, 15.0f), //Position
 		vector3(0.0f, 0.0f, 0.0f),	//Target
 		AXIS_Y);					//Up
+	m_pCameraMngr->GetCamera()->ChangePitch(120);
 
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
@@ -110,7 +111,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(false);
+	m_pEntityMngr->UsePhysicsSolver(true);
 #pragma endregion
 
 	//doesn't work right now
