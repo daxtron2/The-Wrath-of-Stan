@@ -11,6 +11,8 @@ Date: 2017/06
 #include "imgui\ImGuiObject.h"
 
 #include "MyEntityManager.h"
+#include "Simplex/Mesh/Mesh.h"
+
 
 namespace Simplex
 {
@@ -25,6 +27,8 @@ private:
 	bool m_bGUI_Console = false; //show Credits GUI window?
 	bool m_bGUI_Test = false; //show Test GUI window?
 	bool m_bGUI_Controller = false; //show Controller GUI window?
+
+	MyEntity* player;
 
 	uint m_uRenderCallCount = 0; //count of render calls per frame
 	uint m_uControllerCount = 0; //count of controllers connected
@@ -60,6 +64,11 @@ private:
 	sf::Sound m_sound; //sound effect
 	sf::Music m_soundBGM; //background music
 
+	Mesh* leftWall;
+	Mesh* rightWall;
+	Mesh* frontWall;
+	Mesh* backWall;
+	Mesh* floor;
 public:
 #pragma region Constructor / Run / Destructor
 	void SetupRoom(void);

@@ -6,13 +6,24 @@ void Application::InitVariables(void)
 
 	//Set the position and target of the camera
 	m_pCameraMngr->SetPositionTargetAndUpward(
-		vector3(0.0f, 5.0f, 25.0f), //Position
+		vector3(-5.5f, 1.5f, 15.0f), //Position
 		vector3(0.0f, 0.0f, 0.0f),	//Target
 		AXIS_Y);					//Up
 
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
 	m_pEntityMngr = MyEntityManager::GetInstance();
+
+	leftWall = new Mesh();
+	leftWall->GenerateCuboid(vector3(0.5f, 5.0f, 18.0f), C_GRAY);
+	rightWall = new Mesh();
+	rightWall->GenerateCuboid(vector3(0.5f, 5.0f, 18.0f), C_GRAY);
+	backWall = new Mesh();
+	backWall->GenerateCuboid(vector3(12.0f, 5.0f, 0.5f), C_VIOLET);
+	frontWall = new Mesh();
+	frontWall->GenerateCuboid(vector3(12.0f, 5.0f, 0.5f), C_VIOLET);
+	floor = new Mesh();
+	floor->GenerateCuboid(vector3(12.0f, 0.5f, 19.0f), C_GREEN_LIME);
 
 	SetupRoom();
 
@@ -42,6 +53,23 @@ void Application::Display(void)
 {
 	// Clear the screen
 	ClearScreen();
+
+	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
+	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
+	vector3 v3Position;
+
+	v3Position = vector3(-6.5f, 1.5f, 5.0f);
+	leftWall->Render(m4Projection, m4View, glm::translate(v3Position));
+	v3Position = vector3(5.5f, 1.5f, 5.0f);
+	rightWall->Render(m4Projection, m4View, glm::translate(v3Position));
+	v3Position = vector3(-0.5f, 1.5f, -4.0f);
+	frontWall->Render(m4Projection, m4View, glm::translate(v3Position));
+	v3Position = vector3(2.0f, 1.5f, 13.8f);
+	backWall->Render(m4Projection, m4View, glm::translate(v3Position));
+	v3Position = vector3(-0.5f, -1.25f, 4.5f);
+	floor->Render(m4Projection, m4View, glm::translate(v3Position));
+
+
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
@@ -156,6 +184,13 @@ void Application::SetupRoom(void)
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
 
+	//doesn't work right now
+#pragma region Walls and Floor
+	v3Position = vector3(0.0f, 0.0f, 0.0f);
+	m4Position = glm::translate(v3Position);
+	m_pMeshMngr->AddCubeToRenderList(m4Position, C_GRAY);
+
+#pragma endregion
 
 
 

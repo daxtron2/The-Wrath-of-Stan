@@ -414,7 +414,9 @@ void Application::ProcessKeyboard(void)
 		fMultiplier = 5.0f;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	{
 		m_pCameraMngr->MoveForward(m_fMovementSpeed * fMultiplier);
+	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		m_pCameraMngr->MoveForward(-m_fMovementSpeed * fMultiplier);
