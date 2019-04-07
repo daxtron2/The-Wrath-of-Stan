@@ -124,6 +124,42 @@ Simplex::MyEntity::MyEntity(String a_sFileName, String a_sUniqueID)
 	}
 	m_pSolver = new MySolver();
 }
+Simplex::MyEntity::MyEntity(matrix4 a_m4Object, String a_sUniqueID)
+{
+	Init();
+	m_pModel = new Model();
+	m_pModel->SetModelMatrix(a_m4Object);
+
+	GenUniqueID(a_sUniqueID);
+	m_sUniqueID = a_sUniqueID;
+	m_IDMap[a_sUniqueID] = this;
+
+	float fValue = 0.5f;
+	//3--2
+	//|  |
+	//0--1
+	std::vector<vector3> points;
+	points.push_back(vector3(-fValue, -fValue, fValue));
+	points.push_back(vector3(fValue, -fValue, fValue)); 
+	points.push_back(vector3(fValue, fValue, fValue)); 
+	points.push_back(vector3(-fValue, fValue, fValue)); 
+	points.push_back(vector3(-fValue, -fValue, -fValue));
+	points.push_back(vector3(fValue, -fValue, -fValue));
+	points.push_back(vector3(fValue, fValue, -fValue)); 
+	points.push_back(vector3(-fValue, fValue, -fValue));
+
+	for (int i = 0; i < points.size(); i++)
+	{
+		points[i] = vector4(points[i], 1) * a_m4Object;
+	}
+
+	m_pRigidBody = new MyRigidBody(points); //generate a rigid body
+	m_bInMemory = true; //mark this entity as viable
+
+	m_pSolver = new MySolver();
+
+}
+
 Simplex::MyEntity::MyEntity(MyEntity const& other)
 {
 	m_bInMemory = other.m_bInMemory;

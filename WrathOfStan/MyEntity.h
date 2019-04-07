@@ -40,6 +40,7 @@ public:
 	Output: class object instance
 	*/
 	MyEntity(String a_sFileName, String a_sUniqueID = "NA");
+	MyEntity(matrix4 a_m4Object, String a_sUniqueID = "NA");
 	/*
 	Usage: Copy Constructor
 	Arguments: class object to copy

@@ -18,7 +18,7 @@ void Application::ProcessMousePressed(sf::Event a_event)
 	{
 	default: break;
 	case sf::Mouse::Button::Left:
-		gui.m_bMousePressed[0] = true;
+		gui.m_bMousePressed[0] = true;		
 		break;
 	case sf::Mouse::Button::Middle:
 		gui.m_bMousePressed[1] = true;
@@ -32,6 +32,8 @@ void Application::ProcessMousePressed(sf::Event a_event)
 
 	for (int i = 0; i < 3; i++)
 		gui.io.MouseDown[i] = gui.m_bMousePressed[i];
+
+
 }
 void Application::ProcessMouseReleased(sf::Event a_event)
 {
@@ -40,6 +42,7 @@ void Application::ProcessMouseReleased(sf::Event a_event)
 	default: break;
 	case sf::Mouse::Button::Left:
 		gui.m_bMousePressed[0] = false;
+		m_bPunchedLastFrame = false;
 		break;
 	case sf::Mouse::Button::Middle:
 		gui.m_bMousePressed[1] = false;

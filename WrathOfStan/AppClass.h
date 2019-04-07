@@ -38,6 +38,7 @@ private:
 	bool m_bFocused = true; //is the window focused?
 
 	float m_fMovementSpeed = 0.1f; //how fast the camera will move
+	float m_fPunchForce = 1.f; //force multiplier of punch
 
 	vector3 m_v3Mouse = vector3(); //position of the mouse in the window
 	bool m_bFPC = false;// First Person Camera flag
@@ -47,6 +48,9 @@ private:
 	vector4 m_v4ClearColor; //Color of the scene
 	bool m_bRunning = false; //Is app running?
 	bool m_bModifier = false; //is shift pressed?
+	bool m_bPunchedLastFrame = false;
+	bool m_bPunching = false;
+	bool m_bEnablePropPhysics = false;//whether all props have physics on or not
 
 	sf::Window* m_pWindow = nullptr; //SFML window
 	SystemSingleton* m_pSystem = nullptr; //Singleton of the system
@@ -68,6 +72,7 @@ private:
 public:
 #pragma region Constructor / Run / Destructor
 	void SetupRoom(void);
+	void Punch(void);
 	/*
 	USAGE: Constructor
 	ARGUMENTS: ---
