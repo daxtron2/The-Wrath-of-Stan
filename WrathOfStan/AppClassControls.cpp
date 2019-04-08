@@ -418,7 +418,8 @@ void Application::ProcessKeyboard(void)
 		//m_pCameraMngr->MoveForward(m_fMovementSpeed * fMultiplier);
 		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
 		player->SetPosition(vector3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.25f));
-		
+		//SafeDelete(m_pRoot);
+		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
@@ -426,6 +427,8 @@ void Application::ProcessKeyboard(void)
 		//m_pCameraMngr->MoveForward(-m_fMovementSpeed * fMultiplier);
 		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
 		player->SetPosition(vector3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.25f));
+		//SafeDelete(m_pRoot);
+		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -433,6 +436,8 @@ void Application::ProcessKeyboard(void)
 		//m_pCameraMngr->MoveSideways(-m_fMovementSpeed * fMultiplier);
 		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
 		player->SetPosition(vector3(player->GetPosition().x - 0.25f, player->GetPosition().y, player->GetPosition().z));
+		//SafeDelete(m_pRoot);
+		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
@@ -440,6 +445,8 @@ void Application::ProcessKeyboard(void)
 		//m_pCameraMngr->MoveSideways(m_fMovementSpeed * fMultiplier);
 		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
 		player->SetPosition(vector3(player->GetPosition().x + 0.25f, player->GetPosition().y, player->GetPosition().z));
+		//SafeDelete(m_pRoot);
+		//_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))

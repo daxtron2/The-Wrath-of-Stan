@@ -20,7 +20,7 @@ void Application::InitVariables(void)
 	rightWall = new Mesh();
 	rightWall->GenerateCuboid(vector3(0.5f, 5.0f, 18.0f), C_GRAY);
 	backWall = new Mesh();
-	backWall->GenerateCuboid(vector3(12.0f, 5.0f, 0.5f), C_VIOLET);
+	backWall->GenerateCuboid(vector3(10.0f, 5.0f, 0.5f), C_VIOLET);
 	frontWall = new Mesh();
 	frontWall->GenerateCuboid(vector3(12.0f, 5.0f, 0.5f), C_VIOLET);
 	floor = new Mesh();
@@ -28,8 +28,8 @@ void Application::InitVariables(void)
 
 	SetupRoom();
 
-
-
+	//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+	//m_pEntityMngr->Update();
 }
 void Application::Update(void)
 {
@@ -65,12 +65,12 @@ void Application::Display(void)
 	rightWall->Render(m4Projection, m4View, glm::translate(v3Position));
 	v3Position = vector3(-0.5f, 1.5f, -4.0f);
 	frontWall->Render(m4Projection, m4View, glm::translate(v3Position));
-	v3Position = vector3(2.0f, 1.5f, 13.8f);
+	v3Position = vector3(0.5f, 1.5f, 13.8f);
 	backWall->Render(m4Projection, m4View, glm::translate(v3Position));
 	v3Position = vector3(-0.5f, -1.25f, 4.5f);
 	floor->Render(m4Projection, m4View, glm::translate(v3Position));
 
-
+	//m_pRoot->Display();
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
@@ -91,6 +91,8 @@ void Application::Display(void)
 
 void Application::Release(void)
 {
+	//SafeDelete(m_pRoot);
+
 	//release GUI
 	ShutdownGUI();
 }
