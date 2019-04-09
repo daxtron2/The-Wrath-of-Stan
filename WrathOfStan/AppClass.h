@@ -73,6 +73,7 @@ private:
 	Mesh* frontWall;
 	Mesh* backWall;
 	Mesh* floor;
+
 public:
 #pragma region Constructor / Run / Destructor
 	void SetupRoom(void);
