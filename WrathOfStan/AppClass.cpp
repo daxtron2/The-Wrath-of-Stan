@@ -4,12 +4,14 @@ void Application::InitVariables(void)
 {
 	m_sProgrammer = "De George, Max - mtd3442@rit.edu\nKaushik, Rohit - rgk8966@rit.edu\nPaseltiner, Matthew - mjp3591@rit.edu\nWolschon, TJ - tjw3948@rit.edu";
 
+	cameraTarget = vector3(0.0f, 2.0f, 5.0f);
+
 	//Set the position and target of the camera
-	m_pCameraMngr->SetPositionTargetAndUpward(
-		vector3(0.0f, 7.0f, 15.0f), //Position
-		vector3(0.0f, 7.0f, 0.0f),	//Target
-		AXIS_Y);					//Up
-	m_pCameraMngr->GetCamera()->ChangePitch(0);
+	//m_pCameraMngr->SetPositionTargetAndUpward(
+		//vector3(0.0f, 10.0f, 17.5f), //Position
+		//vector3(0.0f, 0.0f, 5.0f),	//Target
+		//AXIS_Y);					//Up
+	//m_pCameraMngr->GetCamera()->ChangePitch(0);
 
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
@@ -178,14 +180,19 @@ void Application::SetupRoom(void)
 
 #pragma region Player
 	//Player
-	/*
 	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Player");
 	v3Position = vector3(-5.5f, -1.1f, 13.0f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
 	m_pEntityMngr->SetModelMatrix(m4Position);
 	m_pEntityMngr->UsePhysicsSolver(true);
-	*/
+
+	m_pCameraMngr->SetPositionTargetAndUpward(
+		vector3(m_pEntityMngr->GetEntity(0)->GetPosition().x, 1.8f, m_pEntityMngr->GetEntity(0)->GetPosition().z + 0.1f), //Position
+		cameraTarget,	//Target
+		AXIS_Y);					//Up
+
+	m_pCameraMngr->GetCamera()->ChangePitch(0);
 
 #pragma endregion
 
