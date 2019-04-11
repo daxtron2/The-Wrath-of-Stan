@@ -461,6 +461,12 @@ void Application::ProcessKeyboard(void)
 	{
 		m_pCameraMngr->MoveVertical(m_fMovementSpeed * fMultiplier);
 	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+	{
+		DeleteEntities();
+		SetupRoom();
+	}
 #pragma endregion
 }
 //Joystick

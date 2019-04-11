@@ -100,9 +100,9 @@ void Application::Release(void)
 void Application::Punch(void)
 {
 	matrix4 punchBox = glm::inverse(m_pCameraMngr->GetViewMatrix());
-	punchBox = punchBox * glm::scale(vector3(1, 1, 1));
+	punchBox = punchBox * glm::scale(vector3(1, 1, 2));
 	//m_pMeshMngr->AddWireCubeToRenderList(punchBox, C_BLUE);
-
+	
 	static MyEntity* punchEnt = nullptr;
 	if (punchEnt == nullptr)
 	{
@@ -1554,4 +1554,13 @@ void Application::SetupRoom(void)
 	m_pEntityMngr->SetModelMatrix(m4Position);
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 #pragma endregion
+}
+
+void Application::DeleteEntities(void)
+{
+	int entityCount = m_pEntityMngr->GetEntityCount();
+	for (int x = 0; x < entityCount; x++)
+	{
+		m_pEntityMngr->RemoveEntity(m_pEntityMngr->GetUniqueID(x));
+	}
 }
