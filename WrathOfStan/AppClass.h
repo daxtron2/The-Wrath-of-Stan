@@ -57,7 +57,7 @@ private:
 	bool m_bModifier = false; //is shift pressed?
 	bool m_bPunchedLastFrame = false;
 	bool m_bPunching = false;
-	bool m_bEnablePropPhysics = false;//whether all props have physics on or not
+	bool m_bEnablePropPhysics = true;//whether all props have physics on or not
 
 	sf::Window* m_pWindow = nullptr; //SFML window
 	SystemSingleton* m_pSystem = nullptr; //Singleton of the system
@@ -81,6 +81,7 @@ private:
 public:
 #pragma region Constructor / Run / Destructor
 	void SetupRoom(void);
+	void DeleteEntities(void);
 	void Punch(void);
 	void SpawnPin(void);
 	/*
