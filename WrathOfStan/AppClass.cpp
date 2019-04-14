@@ -30,8 +30,11 @@ void Application::InitVariables(void)
 
 	SetupRoom();
 
-	//m_pRoot = new MyOctant(m_uOctantLevels, 5);
-	//m_pEntityMngr->Update();
+	if (m_bOctreeActive)
+	{
+		m_pRoot = new MyOctant(m_uOctantLevels, 5);
+		m_pEntityMngr->Update();
+	}
 }
 void Application::Update(void)
 {
@@ -50,6 +53,19 @@ void Application::Update(void)
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
 	
+	//Get a timer
+	static float fTimer = 0;	//store the new timer
+	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+	if (m_bOctreeActive)
+	{
+		if (static_cast<int>(fTimer) > 1.0f)
+		{
+			SafeDelete(m_pRoot);
+			m_pRoot = new MyOctant(m_uOctantLevels, 5);
+			fTimer = 0;
+		}
+	}
 	Punch();
 }
 void Application::Display(void)
@@ -72,7 +88,8 @@ void Application::Display(void)
 	v3Position = vector3(-0.5f, -1.25f, 4.5f);
 	floor->Render(m4Projection, m4View, glm::translate(v3Position));
 
-	//m_pRoot->Display();
+	if (m_bOctreeActive)
+		m_pRoot->Display();
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
@@ -93,7 +110,8 @@ void Application::Display(void)
 
 void Application::Release(void)
 {
-	//SafeDelete(m_pRoot);
+	if (m_bOctreeActive)
+		SafeDelete(m_pRoot);
 	SafeDelete(m_pCamera);
 
 	//release GUI
@@ -169,6 +187,19 @@ void Application::Punch(void)
 	}
 }
 
+void Application::SpawnPin(void) 
+{
+	vector3 v3Position = vector3(0.0f);
+	matrix4 m4Position = IDENTITY_M4;
+
+	m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Pin");
+	v3Position = vector3(-5.5f, -1.1f, 13.0f);
+	m4Position = glm::translate(v3Position);
+	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
+	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->UsePhysicsSolver(true);
+}
+
 void Application::SetupRoom(void)
 {
 	vector3 v3Position = vector3(0.0f);
@@ -181,7 +212,7 @@ void Application::SetupRoom(void)
 
 #pragma region Player
 	//Player
-	/*m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Player");
+	/*m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
 	v3Position = vector3(-5.5f, -1.1f, 13.0f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);

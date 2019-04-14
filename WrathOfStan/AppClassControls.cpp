@@ -59,27 +59,43 @@ void Application::ProcessMouseReleased(sf::Event a_event)
 }
 void Application::ProcessMouseScroll(sf::Event a_event)
 {
-	gui.io.MouseWheel = a_event.mouseWheelScroll.delta;
+	/*gui.io.MouseWheel = a_event.mouseWheelScroll.delta;
 	float fSpeed = a_event.mouseWheelScroll.delta;
 	float fMultiplier = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
 
 	if (fMultiplier)
 		fSpeed *= 2.0f;
-	m_pCameraMngr->MoveForward(-fSpeed);
+	m_pCameraMngr->MoveForward(-fSpeed);*/
 }
 //Keyboard
 void Application::ProcessKeyPressed(sf::Event a_event)
 {
+	matrix4 m4Position;
 	switch (a_event.key.code)
 	{
 	default: break;
 	case sf::Keyboard::Space:
-		m_sound.play();
+		//m_sound.play();
+		//Spawn Pin
+		SpawnPin();
+		/*m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Steve");
+		m4Position = glm::translate(vector3(0.0f, 0.0f, 0.0f));
+		m4Position = m4Position * glm::rotate(glm::radians(270.0f), AXIS_Y);
+		m_pEntityMngr->SetModelMatrix(m4Position);
+		m_pEntityMngr->UsePhysicsSolver(true);*/
 		break;
 	case sf::Keyboard::LShift:
 	case sf::Keyboard::RShift:
 		m_bModifier = true;
+		break;
+	case sf::Keyboard::O:
+		if (m_bOctreeActive)
+			SafeDelete(m_pRoot)
+		else
+			m_pRoot = new MyOctant(m_uOctantLevels, 5);
+
+		m_bOctreeActive = !m_bOctreeActive;
 		break;
 	}
 	
@@ -476,7 +492,7 @@ void Application::ProcessKeyboard(void)
 		);
 
 		//SafeDelete(m_pRoot);
-		//_pRoot = new MyOctant(m_uOctantLevels, 5);
+		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))

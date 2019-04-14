@@ -22,9 +22,11 @@ class Application
 {
 	MyEntityManager* m_pEntityMngr = nullptr; //Entity Manager
 	MyOctant* m_pRoot = nullptr; //octree root
-	//uint m_uOctantID = -1; //Index of Octant to display
-	//uint m_uObjects = 0; //Number of objects in the scene
-	uint m_uOctantLevels = 0; //Number of levels in the octree
+	uint m_uOctantID = -1; //Index of Octant to display
+	uint m_uObjects = 0; //Number of objects in the scene
+	uint m_uOctantLevels = 1; //Number of levels in the octree
+
+	bool m_bOctreeActive = false;
 
 private:
 	static ImGuiObject gui; //GUI object
@@ -80,6 +82,7 @@ public:
 #pragma region Constructor / Run / Destructor
 	void SetupRoom(void);
 	void Punch(void);
+	void SpawnPin(void);
 	/*
 	USAGE: Constructor
 	ARGUMENTS: ---
