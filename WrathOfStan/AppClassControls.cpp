@@ -393,8 +393,20 @@ void Application::CameraRotation(float a_fSpeed)
 	//Change the Yaw and the Pitch of the camera
 	//m_pCameraMngr->ChangeYaw(fAngleY * 0.25f);
 	//m_pCameraMngr->ChangePitch(-fAngleX * 0.25f);
-	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
+	m_pCamera->RotateCamera(fAngleX * 5.0f, fAngleY * 5.0f);
 
+	m_pCameraMngr->SetViewMatrix(m_pCamera->GetViewMatrix());
+	m_pCameraMngr->SetProjectionMatrix(m_pCamera->GetProjectionMatrix());
+
+	m_pCameraMngr->SetForward(m_pCamera->GetForward());
+	m_pCameraMngr->SetRightward(m_pCamera->GetRightward());
+	m_pCameraMngr->SetPositionTargetAndUpward(
+		m_pCamera->GetPosition(),
+		m_pCamera->GetTarget(),
+		m_pCamera->GetUpward()
+	);
+
+	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 
 }
 //Keyboard
@@ -417,54 +429,52 @@ void Application::ProcessKeyboard(void)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		//m_pCameraMngr->MoveForward(.25f);
-		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
-		vector3 playerOldPos = player->GetPosition();
-		player->SetPosition(vector3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.25f));
-		m_pCameraMngr->SetPosition(vector3(player->GetPosition().x, m_pCameraMngr->GetPosition().y, player->GetPosition().z));
-		
-		cameraTarget.z += 0.25f;
-		m_pCameraMngr->SetTarget(cameraTarget);
+		m_pCamera->MoveForward(m_fMovementSpeed * fMultiplier);
+		m_pCameraMngr->SetPositionTargetAndUpward(
+			m_pCamera->GetPosition(),
+			m_pCamera->GetTarget(),
+			m_pCamera->GetUpward()
+		);
+
 		//SafeDelete(m_pRoot);
 		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		//m_pCameraMngr->MoveForward(-m_fMovementSpeed * fMultiplier);
-		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
-		player->SetPosition(vector3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.25f));
-		m_pCameraMngr->SetPosition(vector3(player->GetPosition().x, m_pCameraMngr->GetPosition().y, player->GetPosition().z));
-		
-		cameraTarget.z -= 0.25f;
-		m_pCameraMngr->SetTarget(cameraTarget);
+		m_pCamera->MoveForward(-m_fMovementSpeed * fMultiplier);
+		m_pCameraMngr->SetPositionTargetAndUpward(
+			m_pCamera->GetPosition(),
+			m_pCamera->GetTarget(),
+			m_pCamera->GetUpward()
+		);
+
 		//SafeDelete(m_pRoot);
 		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
+		m_pCamera->MoveSideways(m_fMovementSpeed * fMultiplier);
+		m_pCameraMngr->SetPositionTargetAndUpward(
+			m_pCamera->GetPosition(),
+			m_pCamera->GetTarget(),
+			m_pCamera->GetUpward()
+		);
 
-		//m_pCameraMngr->MoveSideways(-m_fMovementSpeed * fMultiplier);
-		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
-		player->SetPosition(vector3(player->GetPosition().x + 0.25f, player->GetPosition().y, player->GetPosition().z));
-		m_pCameraMngr->SetPosition(vector3(player->GetPosition().x, m_pCameraMngr->GetPosition().y, player->GetPosition().z));
-
-		cameraTarget.x += 0.25f;
-		m_pCameraMngr->SetTarget(cameraTarget);
 		//SafeDelete(m_pRoot);
 		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		m_pCameraMngr->MoveSideways(m_fMovementSpeed * fMultiplier);
-		player = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Player"));
-		player->SetPosition(vector3(player->GetPosition().x - 0.25f, player->GetPosition().y, player->GetPosition().z));
-		m_pCameraMngr->SetPosition(vector3(player->GetPosition().x, m_pCameraMngr->GetPosition().y, player->GetPosition().z));
+		m_pCamera->MoveSideways(-m_fMovementSpeed * fMultiplier);
+		m_pCameraMngr->SetPositionTargetAndUpward(
+			m_pCamera->GetPosition(),
+			m_pCamera->GetTarget(),
+			m_pCamera->GetUpward()
+		);
 
-		cameraTarget.x -= 0.25f;
-		m_pCameraMngr->SetTarget(cameraTarget);
 		//SafeDelete(m_pRoot);
 		//_pRoot = new MyOctant(m_uOctantLevels, 5);
 	}

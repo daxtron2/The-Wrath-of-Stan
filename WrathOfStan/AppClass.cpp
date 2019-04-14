@@ -4,8 +4,6 @@ void Application::InitVariables(void)
 {
 	m_sProgrammer = "De George, Max - mtd3442@rit.edu\nKaushik, Rohit - rgk8966@rit.edu\nPaseltiner, Matthew - mjp3591@rit.edu\nWolschon, TJ - tjw3948@rit.edu";
 
-	cameraTarget = vector3(0.0f, 2.0f, 5.0f);
-
 	//Set the position and target of the camera
 	//m_pCameraMngr->SetPositionTargetAndUpward(
 		//vector3(0.0f, 10.0f, 17.5f), //Position
@@ -27,6 +25,8 @@ void Application::InitVariables(void)
 	frontWall->GenerateCuboid(vector3(12.0f, 5.0f, 0.5f), C_VIOLET);
 	floor = new Mesh();
 	floor->GenerateCuboid(vector3(12.0f, 0.5f, 19.0f), C_GREEN_LIME);
+
+	m_pCamera = new MyCamera();
 
 	SetupRoom();
 
@@ -94,6 +94,7 @@ void Application::Display(void)
 void Application::Release(void)
 {
 	//SafeDelete(m_pRoot);
+	SafeDelete(m_pCamera);
 
 	//release GUI
 	ShutdownGUI();
@@ -180,19 +181,30 @@ void Application::SetupRoom(void)
 
 #pragma region Player
 	//Player
-	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Player");
+	/*m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Player");
 	v3Position = vector3(-5.5f, -1.1f, 13.0f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(true);
+	m_pEntityMngr->UsePhysicsSolver(true);*/
 
+	m_pCamera->SetPositionTargetAndUpward(
+		vector3(-3.5f, 0.8f, 11.5f), //Camera position
+		vector3(-3.5f, 0.8f, 9.0f), //What I'm looking at
+		AXIS_Y); //What is up
+
+	m_pCameraMngr->SetProjectionMatrix(m_pCamera->GetProjectionMatrix());
+	m_pCameraMngr->SetViewMatrix(m_pCamera->GetViewMatrix());
+
+	m_pCameraMngr->SetForward(m_pCamera->GetForward());
+	m_pCameraMngr->SetRightward(m_pCamera->GetRightward());
 	m_pCameraMngr->SetPositionTargetAndUpward(
-		vector3(m_pEntityMngr->GetEntity(0)->GetPosition().x, 1.8f, m_pEntityMngr->GetEntity(0)->GetPosition().z + 0.1f), //Position
-		cameraTarget,	//Target
-		AXIS_Y);					//Up
+		m_pCamera->GetPosition(),
+		m_pCamera->GetTarget(),
+		m_pCamera->GetUpward()
+	);
 
-	m_pCameraMngr->GetCamera()->ChangePitch(0);
+	//m_pCameraMngr->GetCamera()->ChangePitch(0);
 
 #pragma endregion
 

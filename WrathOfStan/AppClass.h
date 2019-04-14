@@ -5,12 +5,13 @@ Date: 2017/06
 #ifndef __APPLICATIONCLASS_H_
 #define __APPLICATIONCLASS_H_
 
-#include "Definitions.h"
+#include "MyCamera.h"
 
 #include "ControllerConfiguration.h"
 #include "imgui\ImGuiObject.h"
 
 #include "MyOctant.h"
+
 #include "Simplex/Mesh/Mesh.h"
 
 
@@ -24,7 +25,6 @@ class Application
 	//uint m_uOctantID = -1; //Index of Octant to display
 	//uint m_uObjects = 0; //Number of objects in the scene
 	uint m_uOctantLevels = 0; //Number of levels in the octree
-	vector3 cameraTarget;
 
 private:
 	static ImGuiObject gui; //GUI object
@@ -62,6 +62,7 @@ private:
 	LightManager* m_pLightMngr = nullptr; //Light Manager of the system
 	MeshManager* m_pMeshMngr = nullptr; //Mesh Manager
 	CameraManager* m_pCameraMngr = nullptr; //Singleton for the camera manager
+	MyCamera * m_pCamera = nullptr;
 	ControllerInput* m_pController[8]; //Controller
 	uint m_uActCont = 0; //Active Controller of the Application
 
