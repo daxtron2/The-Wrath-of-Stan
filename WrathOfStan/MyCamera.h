@@ -135,6 +135,27 @@ public:
 	vector3 GetAbove(void);
 
 	/*
+	USAGE: Gets the forward vector of the camera
+	ARGUMENTS: --- 
+	OUTPUT: forward vector of camera
+	*/
+	vector3 GetForward(void);
+
+	/*
+	USAGE: Gets the Rightward vector of the camera
+	ARGUMENTS: ---
+	OUTPUT: Rightward vector of camera
+	*/
+	vector3 GetRightward(void);
+
+	/*
+	USAGE: Gets the Upward vector of camera
+	ARGUMENTS: ---
+	OUTPUT: Upward vector of camera
+	*/
+	vector3 GetUpward(void);
+
+	/*
 	USAGE: Sets Perspective Camera
 	ARGUMENTS: bool a_bPerspective = true -> is camera perspective or orthographic
 	OUTPUT: ---

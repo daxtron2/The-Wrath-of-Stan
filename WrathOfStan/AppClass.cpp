@@ -5,11 +5,11 @@ void Application::InitVariables(void)
 	m_sProgrammer = "De George, Max - mtd3442@rit.edu\nKaushik, Rohit - rgk8966@rit.edu\nPaseltiner, Matthew - mjp3591@rit.edu\nWolschon, TJ - tjw3948@rit.edu";
 
 	//Set the position and target of the camera
-	m_pCameraMngr->SetPositionTargetAndUpward(
-		vector3(0.0f, 7.0f, 15.0f), //Position
-		vector3(0.0f, 7.0f, 0.0f),	//Target
-		AXIS_Y);					//Up
-	m_pCameraMngr->GetCamera()->ChangePitch(0);
+	//m_pCameraMngr->SetPositionTargetAndUpward(
+		//vector3(0.0f, 10.0f, 17.5f), //Position
+		//vector3(0.0f, 0.0f, 5.0f),	//Target
+		//AXIS_Y);					//Up
+	//m_pCameraMngr->GetCamera()->ChangePitch(0);
 
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
@@ -26,10 +26,15 @@ void Application::InitVariables(void)
 	floor = new Mesh();
 	floor->GenerateCuboid(vector3(12.0f, 0.5f, 19.0f), C_GREEN_LIME);
 
+	m_pCamera = new MyCamera();
+
 	SetupRoom();
 
-	//m_pRoot = new MyOctant(m_uOctantLevels, 5);
-	//m_pEntityMngr->Update();
+	if (m_bOctreeActive)
+	{
+		m_pRoot = new MyOctant(m_uOctantLevels, 5);
+		m_pEntityMngr->Update();
+	}
 }
 void Application::Update(void)
 {
@@ -48,6 +53,19 @@ void Application::Update(void)
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
 	
+	//Get a timer
+	static float fTimer = 0;	//store the new timer
+	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+	if (m_bOctreeActive)
+	{
+		if (static_cast<int>(fTimer) > 1.0f)
+		{
+			SafeDelete(m_pRoot);
+			m_pRoot = new MyOctant(m_uOctantLevels, 5);
+			fTimer = 0;
+		}
+	}
 	Punch();
 }
 void Application::Display(void)
@@ -70,7 +88,8 @@ void Application::Display(void)
 	v3Position = vector3(-0.5f, -1.25f, 4.5f);
 	floor->Render(m4Projection, m4View, glm::translate(v3Position));
 
-	//m_pRoot->Display();
+	if (m_bOctreeActive)
+		m_pRoot->Display();
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
@@ -91,7 +110,9 @@ void Application::Display(void)
 
 void Application::Release(void)
 {
-	//SafeDelete(m_pRoot);
+	if (m_bOctreeActive)
+		SafeDelete(m_pRoot);
+	SafeDelete(m_pCamera);
 
 	//release GUI
 	ShutdownGUI();
@@ -166,6 +187,19 @@ void Application::Punch(void)
 	}
 }
 
+void Application::SpawnPin(void) 
+{
+	vector3 v3Position = vector3(0.0f);
+	matrix4 m4Position = IDENTITY_M4;
+
+	m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Pin");
+	v3Position = vector3(-5.5f, -1.1f, 13.0f);
+	m4Position = glm::translate(v3Position);
+	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
+	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->UsePhysicsSolver(true);
+}
+
 void Application::SetupRoom(void)
 {
 	vector3 v3Position = vector3(0.0f);
@@ -178,14 +212,30 @@ void Application::SetupRoom(void)
 
 #pragma region Player
 	//Player
-	/*
-	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Player");
+	/*m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
 	v3Position = vector3(-5.5f, -1.1f, 13.0f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(true);
-	*/
+	m_pEntityMngr->UsePhysicsSolver(true);*/
+
+	m_pCamera->SetPositionTargetAndUpward(
+		vector3(-3.5f, 0.8f, 11.5f), //Camera position
+		vector3(-3.5f, 0.8f, 9.0f), //What I'm looking at
+		AXIS_Y); //What is up
+
+	m_pCameraMngr->SetProjectionMatrix(m_pCamera->GetProjectionMatrix());
+	m_pCameraMngr->SetViewMatrix(m_pCamera->GetViewMatrix());
+
+	m_pCameraMngr->SetForward(m_pCamera->GetForward());
+	m_pCameraMngr->SetRightward(m_pCamera->GetRightward());
+	m_pCameraMngr->SetPositionTargetAndUpward(
+		m_pCamera->GetPosition(),
+		m_pCamera->GetTarget(),
+		m_pCamera->GetUpward()
+	);
+
+	//m_pCameraMngr->GetCamera()->ChangePitch(0);
 
 #pragma endregion
 

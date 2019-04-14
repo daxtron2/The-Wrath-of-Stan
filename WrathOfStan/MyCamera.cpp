@@ -8,6 +8,9 @@ void Simplex::MyCamera::SetTarget(vector3 a_v3Target) { m_v3Target = a_v3Target;
 vector3 Simplex::MyCamera::GetTarget(void) { return m_v3Target; }
 void Simplex::MyCamera::SetAbove(vector3 a_v3Above) { m_v3Above = a_v3Above; }
 vector3 Simplex::MyCamera::GetAbove(void) { return m_v3Above; }
+vector3 Simplex::MyCamera::GetForward(void) { return m_v3Forward; }
+vector3 Simplex::MyCamera::GetRightward(void) { return m_v3Rightward; }
+vector3 Simplex::MyCamera::GetUpward(void) { return m_v3Upward; }
 void Simplex::MyCamera::SetPerspective(bool a_bPerspective) { m_bPerspective = a_bPerspective; }
 void Simplex::MyCamera::SetFOV(float a_fFOV) { m_fFOV = a_fFOV; }
 void Simplex::MyCamera::SetResolution(vector2 a_v2Resolution) { m_v2Resolution = a_v2Resolution; }
@@ -188,6 +191,7 @@ void MyCamera::RotateCamera(float xAngle, float yAngle)
 
 	// set the forward / right / up vector
 	m_v3Forward = glm::normalize(m_v3Target - m_v3Position);
+	m_v3Forward.y = 0.0f;
 	m_v3Rightward = glm::normalize(glm::cross(m_v3Forward, glm::normalize(m_v3Above - m_v3Position)));
 	m_v3Upward = glm::normalize(m_v3Above - m_v3Position);
 }
