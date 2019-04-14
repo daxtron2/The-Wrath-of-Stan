@@ -105,7 +105,7 @@ void MySolver::Update(void)
 	//ApplyForce(vector3(0.0f, -0.16f, 0.0f) * m_fMass); //real world borring gravity! (9.81 * deltatime)
 
 
-	m_v3Velocity += m_v3Acceleration;
+	m_v3Velocity += m_v3Acceleration * .0016f;
 
 	float fMaxVelocity = 5.0f;
 	m_v3Velocity = CalculateMaxVelocity(m_v3Velocity, fMaxVelocity);
@@ -141,7 +141,7 @@ void MySolver::ResolveCollision(MySolver* a_pOther)
 		ApplyForce(-m_v3Velocity);
 		a_pOther->ApplyForce(m_v3Velocity);
 	}
-	else//Objects are almost static but they need to be separated
+	else// if (fMagThis != 0 || fMagOther != 0 )//Objects are almost static but they need to be separated
 	{
 		vector3 v3Direction = m_v3Position - a_pOther->m_v3Position;
 		if (glm::length(v3Direction) != 0)

@@ -79,6 +79,7 @@ public:
 	void SetupRoom(void);
 	void DeleteEntities(void);
 	void Punch(void);
+	void SetRow(vector3 origin);
 	/*
 	USAGE: Constructor
 	ARGUMENTS: ---
