@@ -2,7 +2,7 @@
 using namespace Simplex;
 void Application::InitVariables(void)
 {
-	m_sProgrammer = "De George, Max - mtd3442@rit.edu\nKaushik, Rohit - rgk8966@rit.edu\nPaseltiner, Matthew - mjp3591@rit.edu\nWolschon, TJ - tjw3948@rit.edu";
+	m_sProgrammer = "The Wrath of Stan\n\nDe George, Max - mtd3442@rit.edu\nKaushik, Rohit - rgk8966@rit.edu\nPaseltiner, Matthew - mjp3591@rit.edu\nWolschon, TJ - tjw3948@rit.edu";
 
 	//Set the position and target of the camera
 	//m_pCameraMngr->SetPositionTargetAndUpward(
@@ -11,7 +11,7 @@ void Application::InitVariables(void)
 		//AXIS_Y);					//Up
 	//m_pCameraMngr->GetCamera()->ChangePitch(0);
 
-	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
+	m_pLightMngr->SetPosition(vector3(0.0f, 7.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
 	m_pEntityMngr = MyEntityManager::GetInstance();
 
@@ -103,7 +103,7 @@ void Application::Release(void)
 void Application::Punch(void)
 {
 	matrix4 punchBox = glm::inverse(m_pCameraMngr->GetViewMatrix());
-	punchBox = punchBox * glm::scale(vector3(1, 1, 2.5));
+	punchBox = punchBox * glm::scale(vector3(.5f, .5f, 1.5f));
 	//punchBox = punchBox * glm::translate(m_pCameraMngr->GetForward());
 	//m_pMeshMngr->AddWireCubeToRenderList(punchBox, C_BLUE);
 	
@@ -161,6 +161,7 @@ void Application::Punch(void)
 			for (int i = 0; i < colEntities.size(); i++)
 			{
 				vector3 otherPos = colEntities[i]->GetPosition();
+				colEntities[i]->GetRigidBody()->SetColorOutline(C_BLUE);
 				vector3 playerPos = m_pCameraMngr->GetPosition();
 				vector3 punchDir = glm::normalize(otherPos - playerPos);
 				colEntities[i]->ApplyForce(punchDir * m_fPunchForce);

@@ -25,6 +25,8 @@ protected:
 
 	float m_fRadius = 0.0f; //Radius
 
+	vector3 m_v3ColorOutline = C_YELLOW; //Objects AABB Color
+
 	vector3 m_v3ColorColliding = C_RED; //Color when colliding
 	vector3 m_v3ColorNotColliding = C_WHITE; //Color when not colliding
 
@@ -46,6 +48,10 @@ protected:
 	PRigidBody* m_CollidingArray = nullptr; //array of rigid bodies this one is colliding with
 
 public:
+	void SetColorOutline(vector3 color);
+
+	vector3 GetColorOutline(void);
+
 	/*
 	Usage: Constructor
 	Arguments: std::vector<vector3> a_pointList -> list of points to make the Rigid Body for
