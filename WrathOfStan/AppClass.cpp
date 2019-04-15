@@ -103,7 +103,7 @@ void Application::Release(void)
 void Application::Punch(void)
 {
 	matrix4 punchBox = glm::inverse(m_pCameraMngr->GetViewMatrix());
-	punchBox = punchBox * glm::scale(vector3(1, 1, 2.5));
+	punchBox = punchBox * glm::scale(vector3(.5f, .5f, 1.5f));
 	//punchBox = punchBox * glm::translate(m_pCameraMngr->GetForward());
 	//m_pMeshMngr->AddWireCubeToRenderList(punchBox, C_BLUE);
 	
