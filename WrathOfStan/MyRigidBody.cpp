@@ -10,6 +10,8 @@ void MyRigidBody::Init(void)
 
 	m_fRadius = 0.0f;
 
+	m_v3ColorOutline = C_YELLOW;
+
 	m_v3ColorColliding = C_RED;
 	m_v3ColorNotColliding = C_WHITE;
 
@@ -63,6 +65,8 @@ void MyRigidBody::Release(void)
 	ClearCollidingList();
 }
 //Accessors
+void MyRigidBody::SetColorOutline(vector3 color) { m_v3ColorOutline = color; }
+vector3 MyRigidBody::GetColorOutline(void) { return m_v3ColorOutline; }
 bool MyRigidBody::GetVisibleBS(void) { return m_bVisibleBS; }
 void MyRigidBody::SetVisibleBS(bool a_bVisible) { m_bVisibleBS = a_bVisible; }
 bool MyRigidBody::GetVisibleOBB(void) { return m_bVisibleOBB; }
@@ -346,9 +350,9 @@ void MyRigidBody::AddToRenderList(void)
 	if (m_bVisibleARBB)
 	{
 		if (m_uCollidingCount > 0)
-			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
+			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), m_v3ColorOutline);
 		else
-			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
+			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), m_v3ColorOutline);
 	}
 }
 bool MyRigidBody::IsInCollidingArray(MyRigidBody* a_pEntry)
