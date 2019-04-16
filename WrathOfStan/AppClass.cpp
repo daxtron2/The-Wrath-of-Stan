@@ -164,7 +164,7 @@ void Application::Punch(void)
 				colEntities[i]->GetRigidBody()->SetColorOutline(C_BLUE);
 				vector3 playerPos = m_pCameraMngr->GetPosition();
 				vector3 punchDir = glm::normalize(otherPos - playerPos);
-				colEntities[i]->ApplyForce(punchDir * m_fPunchForce);
+				colEntities[i]->ApplyForce(punchDir * m_fPunchForce *1000);
 				//std::cout << "Punch Direction: " << punchDir.x << ", " << punchDir.y << ", " << punchDir.z << std::endl;
 			}
 		}
@@ -320,18 +320,21 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * glm::scale(vector3(2, 1, 2));
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(1000.f);
 
 	m_pEntityMngr->AddEntity("Stan\\Wall.obj", "LeftWall");
 	v3Position = vector3(-7.5f, 0, 5.0f);
 	m4Position = glm::translate(v3Position);
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	
+	m_pEntityMngr->SetMass(1000.f);
+
 	m_pEntityMngr->AddEntity("Stan\\Wall.obj", "RightWall");
 	v3Position = vector3(5.5f, 0, 5.0f);
 	m4Position = glm::translate(v3Position);
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(1000.f);
 
 	m_pEntityMngr->AddEntity("Stan\\SmWall.obj", "BackWall");
 	v3Position = vector3(-0.5f, 0, 13.8f);
@@ -339,6 +342,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * glm::scale(vector3(2, 1, 1));
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(1000.f);
 
 	m_pEntityMngr->AddEntity("Stan\\SmWall.obj", "FrontWall");
 	v3Position = vector3(-0.5f, 0, -4.0f);
@@ -346,6 +350,8 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * glm::scale(vector3(2, 1, 1));
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(1000.f);
+
 #pragma endregion
 
 	for (int z = 0; z < 4; z++) 
