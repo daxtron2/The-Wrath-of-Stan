@@ -27,6 +27,7 @@ class Application
 	uint m_uOctantLevels = 1; //Number of levels in the octree
 
 	bool m_bOctreeActive = false;
+	std::vector<MyEntity*> m_pStanPins;
 
 private:
 	static ImGuiObject gui; //GUI object

@@ -264,12 +264,19 @@ void Application::SpawnPin(void)
 	vector3 v3Position = vector3(0.0f);
 	matrix4 m4Position = IDENTITY_M4;
 
-	m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Pin");
-	v3Position = vector3(-5.5f, -1.1f, 13.0f);
+
+	MyEntity* pin = new MyEntity("Stan\\StenPin.obj", "Pin");
+	//m_pStanPins.push_back(pin);
+
+	m_pEntityMngr->AddEntity(pin);
+	v3Position = vector3(m_pCamera->GetPosition().x, m_pCamera->GetPosition().y - 0.1, m_pCamera->GetPosition().z);
 	m4Position = glm::translate(v3Position);
-	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
-	m_pEntityMngr->SetModelMatrix(m4Position);
+	m4Position = m4Position * glm::rotate(glm::radians(0.0f), AXIS_Y);
 	m_pEntityMngr->UsePhysicsSolver(true);
+	m_pEntityMngr->SetModelMatrix(m4Position);
+
+	pin->ApplyForce(m_pCamera->GetForward() * 1000.0f);
+	
 }
 
 void Application::SetupRoom(void)
@@ -284,7 +291,9 @@ void Application::SetupRoom(void)
 
 #pragma region Player
 	//Player
-	/*m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
+	m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
+	m_pEntityMngr->RemoveEntity("Player");
+	/*
 	v3Position = vector3(-5.5f, -1.1f, 13.0f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
