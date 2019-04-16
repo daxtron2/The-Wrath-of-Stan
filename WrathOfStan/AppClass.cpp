@@ -292,9 +292,9 @@ void Application::SetupRoom(void)
 	m_pEntityMngr->UsePhysicsSolver(true);*/
 
 	m_pCamera->SetPositionTargetAndUpward(
-		vector3(-3.5f, 0.8f, 11.5f), //Camera position
-		vector3(-3.5f, 0.8f, 9.0f), //What I'm looking at
-		AXIS_Y); //What is up
+		vector3(-3.5f, 1.8f, 11.5f), //Camera position
+		vector3(-3.5f, 1.8f, 9.0f), //What I'm looking at
+		AXIS_Y); //What is up my dude
 
 	m_pCameraMngr->SetProjectionMatrix(m_pCamera->GetProjectionMatrix());
 	m_pCameraMngr->SetViewMatrix(m_pCamera->GetViewMatrix());
