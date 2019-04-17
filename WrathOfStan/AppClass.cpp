@@ -271,7 +271,7 @@ void Application::SpawnPin(void)
 	m_pEntityMngr->AddEntity(pin);
 
 	//matrix4 punchBox = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Punch"))->GetModelMatrix();
-	//vector3 forward = punchBox[2];
+	//vector3 forward = punchBox[2]; 
 	//forward /= 2;
 
 	v3Position = vector3(m_pCamera->GetPosition().x, m_pCamera->GetPosition().y - 0.1, m_pCamera->GetPosition().z);
