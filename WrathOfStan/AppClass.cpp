@@ -269,6 +269,11 @@ void Application::SpawnPin(void)
 	//m_pStanPins.push_back(pin);
 
 	m_pEntityMngr->AddEntity(pin);
+
+	//matrix4 punchBox = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Punch"))->GetModelMatrix();
+	//vector3 forward = punchBox[2];
+	//forward /= 2;
+
 	v3Position = vector3(m_pCamera->GetPosition().x, m_pCamera->GetPosition().y - 0.1, m_pCamera->GetPosition().z);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(0.0f), AXIS_Y);
@@ -276,7 +281,6 @@ void Application::SpawnPin(void)
 	m_pEntityMngr->SetModelMatrix(m4Position);
 
 	pin->ApplyForce(m_pCamera->GetForward() * 1000.0f);
-	
 }
 
 void Application::SetupRoom(void)
@@ -291,9 +295,7 @@ void Application::SetupRoom(void)
 
 #pragma region Player
 	//Player
-	m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
-	m_pEntityMngr->RemoveEntity("Player");
-	/*
+	/*m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
 	v3Position = vector3(-5.5f, -1.1f, 13.0f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
