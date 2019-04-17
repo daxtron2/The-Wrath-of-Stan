@@ -29,6 +29,8 @@ class Application
 	bool m_bOctreeActive = false;
 	std::vector<MyEntity*> m_pStanPins;
 
+	MyEntity* m_pFrontEntity = nullptr;
+
 private:
 	static ImGuiObject gui; //GUI object
 	bool m_bGUI_Main = true; //show Main GUI window?
@@ -81,6 +83,7 @@ private:
 
 public:
 #pragma region Constructor / Run / Destructor
+	void MoveFrontEntity(vector3 position);
 	void SetupRoom(void);
 	void DeleteEntities(void);
 	void Punch(void);
