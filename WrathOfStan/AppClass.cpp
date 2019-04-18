@@ -348,8 +348,9 @@ void Application::SetupRoom(void)
 
 #pragma region Player
 	//Player
-	/*m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
-	v3Position = vector3(-5.5f, -1.1f, 13.0f);
+	m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
+	m_pEntityMngr->RemoveEntity("Player");
+	/*v3Position = vector3(-5.5f, -1.1f, 13.0f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
 	m_pEntityMngr->SetModelMatrix(m4Position);
