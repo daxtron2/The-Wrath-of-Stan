@@ -101,7 +101,7 @@ vector3 RoundSmallVelocity(vector3 a_v3Velocity, float minVelocity = 0.01f)
 void MySolver::SetIsColliding(bool a_bIsCollding) { m_bIsCollding = a_bIsCollding; }
 void MySolver::Update(void)
 {
-	ApplyForce(vector3(0.0f, -0.12f, 0.0f) * m_fMass);
+	ApplyForce(vector3(0.0f, -0.12f, 0.0f) * m_fMass * 9.81f);
 	//ApplyForce(vector3(0.0f, -0.16f, 0.0f) * m_fMass); //real world borring gravity! (9.81 * deltatime)
 
 

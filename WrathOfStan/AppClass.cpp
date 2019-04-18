@@ -57,7 +57,16 @@ void Application::Update(void)
 			fTimer = 0;
 		}
 	}
-	Punch();
+//	Punch();
+
+	vector3 v3BoxPosition = m_pCameraMngr->GetForward() + m_pCameraMngr->GetPosition();
+	//v3BoxPosition = * 1.5f;
+
+	//std::cout << v3BoxPosition.x << std::endl;
+	//std::cout << v3BoxPosition.y << std::endl;
+	//std::cout << v3BoxPosition.z << std::endl;
+
+	MoveFrontEntity(v3BoxPosition);
 }
 void Application::Display(void)
 {
@@ -67,8 +76,6 @@ void Application::Display(void)
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 	vector3 v3Position;
-
-
 
 	if (m_bOctreeActive)
 		m_pRoot->Display();
@@ -100,11 +107,47 @@ void Application::Release(void)
 	ShutdownGUI();
 }
 
+
+void Application::MoveFrontEntity(vector3 position)
+{
+	matrix4 test = glm::translate(position);
+	test = test * glm::scale(vector3(.3f, .3f, .3f));
+
+	if (m_pFrontEntity == nullptr)
+	{
+		//std::cout << "IN" << std::endl;
+
+		int frontEndId = m_pEntityMngr->GetEntityIndex("Front");
+
+		if (frontEndId != -1)
+		{
+			m_pFrontEntity = m_pEntityMngr->GetEntity(frontEndId);
+		}
+		else
+		{
+			//matrix4 m4FrontEntity = IDENTITY_M4;
+			//m4FrontEntity = m4FrontEntity * glm::translate(position);
+			//m4FrontEntity = m4FrontEntity * glm::scale(vector3(2.f, 2.f, 2.f));
+			m_pEntityMngr->AddEntity(new MyEntity(test, "Front"));
+			m_pEntityMngr->UsePhysicsSolver(true);
+		}
+	}
+	else
+	{
+		//std::cout << "OUT" << std::endl;
+		m_pFrontEntity->SetModelMatrix(test);
+		//std::cout << "ENT LOCATION: " << m_pFrontEntity->GetPosition().x << " " << m_pFrontEntity->GetPosition().y << " " << m_pFrontEntity->GetPosition().z << std::endl;
+		//m_pEntityMngr->RemoveEntity(m_pEntityMngr->GetEntityIndex("Front"));
+
+	}
+
+}
 void Application::Punch(void)
 {
 	matrix4 punchBox = glm::inverse(m_pCameraMngr->GetViewMatrix());
+	//punchBox = punchBox * glm::translate(v3BoxPosition);
 	punchBox = punchBox * glm::scale(vector3(.5f, .5f, 1.5f));
-	//punchBox = punchBox * glm::translate(m_pCameraMngr->GetForward());
+	//punchBox = punchBox * glm::translate(m_pCameraMngr->GetPosition() + m_pCameraMngr->GetForward());
 	//m_pMeshMngr->AddWireCubeToRenderList(punchBox, C_BLUE);
 	
 	static MyEntity* punchEnt = nullptr;
@@ -119,6 +162,7 @@ void Application::Punch(void)
 		{
 			m_pEntityMngr->AddEntity(new MyEntity(punchBox, "Punch"));
 			punchEnt = m_pEntityMngr->GetEntity();
+
 			m_pEntityMngr->UsePhysicsSolver(false);
 		}
 		punchEnt->GetRigidBody()->SetVisibleARBB(false);
@@ -261,15 +305,35 @@ void Application::SetRow(vector3 origin)
 
 void Application::SpawnPin(void) 
 {
-	vector3 v3Position = vector3(0.0f);
-	matrix4 m4Position = IDENTITY_M4;
+	MyEntity* pin = new MyEntity("Stan\\StenPin.obj", "Pin");
+	pin->UsePhysicsSolver(true);
+	pin->SetPosition(m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetPosition());
+	
+	//std::cout << m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetPosition().x << std::endl;
+	//std::cout << m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetPosition().y << std::endl;
+	//std::cout << m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetPosition().z << std::endl;
 
-	m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Pin");
-	v3Position = vector3(-5.5f, -1.1f, 13.0f);
-	m4Position = glm::translate(v3Position);
-	m4Position = m4Position * glm::rotate(glm::radians(180.0f), AXIS_Y);
-	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->UsePhysicsSolver(true);
+	m_pEntityMngr->AddEntity(pin);
+	pin->ApplyForce(m_pCamera->GetForward() * 1000.0f);
+
+	//vector3 v3Position = vector3(0.0f);
+	//matrix4 m4Position = IDENTITY_M4;
+
+
+
+
+	//m_pEntityMngr->AddEntity(pin);
+
+	////v3Position = vector3(m_pCamera->GetPosition().x, m_pCamera->GetPosition().y - 0.1, m_pCamera->GetPosition().z);
+	//v3Position = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetPosition();
+	////m4Position = m4Position * glm::rotate(glm::radians(0.0f), AXIS_Y);
+	//m4Position = glm::translate(v3Position);
+	//m_pEntityMngr->UsePhysicsSolver(true);
+	//m_pEntityMngr->SetModelMatrix(m4Position);
+
+	//pin->SetModelMatrix(m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetModelMatrix());
+
+	//pin->ApplyForce((v3Position - vector3(m_pCamera->GetViewMatrix()[1])) * 1000.0f);
 }
 
 void Application::SetupRoom(void)

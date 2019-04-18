@@ -27,6 +27,9 @@ class Application
 	uint m_uOctantLevels = 1; //Number of levels in the octree
 
 	bool m_bOctreeActive = false;
+	std::vector<MyEntity*> m_pStanPins;
+
+	MyEntity* m_pFrontEntity = nullptr;
 
 private:
 	static ImGuiObject gui; //GUI object
@@ -48,7 +51,7 @@ private:
 	float m_fPunchForce = 1.f; //force multiplier of punch
 
 	vector3 m_v3Mouse = vector3(); //position of the mouse in the window
-	bool m_bFPC = false;// First Person Camera flag
+	bool m_bFPC = true;// First Person Camera flag
 	bool m_bArcBall = false;// Arcball flag
 	quaternion m_qArcBall; //ArcBall quaternion
 
@@ -80,6 +83,7 @@ private:
 
 public:
 #pragma region Constructor / Run / Destructor
+	void MoveFrontEntity(vector3 position);
 	void SetupRoom(void);
 	void DeleteEntities(void);
 	void Punch(void);
