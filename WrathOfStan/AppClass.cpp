@@ -57,7 +57,7 @@ void Application::Update(void)
 			fTimer = 0;
 		}
 	}
-//	Punch();
+	Punch();
 
 	vector3 v3BoxPosition = m_pCameraMngr->GetForward() + m_pCameraMngr->GetPosition();
 	//v3BoxPosition = * 1.5f;
