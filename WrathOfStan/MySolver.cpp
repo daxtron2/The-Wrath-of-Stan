@@ -144,8 +144,9 @@ void MySolver::ResolveCollision(MySolver* a_pOther)
 		{
 			if (this->GetMass() > 12344.f && a_pOther->GetMass() < 12344.f)
 			{
-				a_pOther->ApplyForce(glm::normalize(-a_pOther->GetVelocity()));
-				//a_pOther->SetVelocity(-a_pOther->GetVelocity());
+				//a_pOther->ApplyForce(glm::normalize(-a_pOther->GetVelocity()));
+				//a_pOther->SetVelocity(-a_pOther->GetVelocity());				
+				a_pOther->SetVelocity(glm::normalize(-a_pOther->GetPosition()) * glm::length(a_pOther->GetVelocity()));
 			}
 			else if (this->GetMass() > 12344.f && a_pOther->GetMass() > 12344.f)
 			{
