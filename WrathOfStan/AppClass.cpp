@@ -131,6 +131,7 @@ void Application::MoveFrontEntity(vector3 position)
 			//m4FrontEntity = m4FrontEntity * glm::scale(vector3(2.f, 2.f, 2.f));
 			m_pEntityMngr->AddEntity(new MyEntity(test, "Front"));
 			m_pEntityMngr->UsePhysicsSolver(true);
+			m_pEntityMngr->SetMass(12345.f);
 		}
 	}
 	else
@@ -320,7 +321,7 @@ void Application::SpawnPin(void)
 	//std::cout << m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetPosition().z << std::endl;
 
 	m_pEntityMngr->AddEntity(pin);
-	pin->ApplyForce(m_pCamera->GetForward() * 1000.0f);
+	pin->ApplyForce(m_pCamera->GetForward() * 3.0f);
 
 	//vector3 v3Position = vector3(0.0f);
 	//matrix4 m4Position = IDENTITY_M4;
