@@ -105,7 +105,7 @@ void MySolver::Update(void)
 	//ApplyForce(vector3(0.0f, -0.16f, 0.0f) * m_fMass); //real world borring gravity! (9.81 * deltatime)
 
 
-	m_v3Velocity += m_v3Acceleration * .0016f;
+	m_v3Velocity += m_v3Acceleration; //* .0016f;
 
 	float fMaxVelocity = 5.0f;
 	m_v3Velocity = CalculateMaxVelocity(m_v3Velocity, fMaxVelocity);
@@ -131,27 +131,47 @@ void MySolver::Update(void)
 }
 void MySolver::ResolveCollision(MySolver* a_pOther)
 {
-	//float fMagThis = glm::length(m_v3Velocity);
-	//float fMagOther = glm::length(a_pOther->m_v3Velocity);
+	float fMagThis = glm::length(m_v3Velocity);
+	float fMagOther = glm::length(a_pOther->m_v3Velocity);
 
-	////If the forces are large apply them on each other
-	//if (fMagThis > REPULSIONFORCE || fMagOther > REPULSIONFORCE)
-	//{
-	//	ApplyForce(-m_v3Velocity * 1000);
-	//	a_pOther->ApplyForce(m_v3Velocity * 1000);
-	//}
-	//else// if (fMagThis != 0 || fMagOther != 0 )//Objects are almost static but they need to be separated
-	//{
-	//	//vector3 v3Direction = m_v3Position - a_pOther->m_v3Position;
-	//	//if (glm::length(v3Direction) != 0)
-	//	//	v3Direction = glm::normalize(v3Direction);
-	//	////v3Direction *= 0.04f; //should be multiplied by the delta time
-	//	//v3Direction *= 0.016f; //should be multiplied by the delta time
+	if (this->GetMass() > 12344.f || a_pOther->GetMass() > 12344.f)
+	{
+		if (this->GetMass() > 15000.f || a_pOther->GetMass() > 15000.f)
+		{
+			return;			
+		}
+		else
+		{
+			if (this->GetMass() > 12344.f && a_pOther->GetMass() < 12344.f)
+			{
+				a_pOther->ApplyForce(glm::normalize(-a_pOther->GetVelocity()));
+				//a_pOther->SetVelocity(-a_pOther->GetVelocity());
+			}
+			else if (this->GetMass() > 12344.f && a_pOther->GetMass() > 12344.f)
+			{
+				return;
+			}
+		}
+	}
 
-	//	//ApplyForce(v3Direction);
-	//	//a_pOther->ApplyForce(-v3Direction);
+	//If the forces are large apply them on each other
+	if (fMagThis > REPULSIONFORCE || fMagOther > REPULSIONFORCE)
+	{
+		ApplyForce(-m_v3Velocity);
+		a_pOther->ApplyForce(m_v3Velocity);
+	}
+	else
+	{
+		vector3 v3Direction = m_v3Position - a_pOther->m_v3Position;
+		if (glm::length(v3Direction) != 0)
+			v3Direction = glm::normalize(v3Direction);
+		//v3Direction *= 0.04f; //should be multiplied by the delta time
+		v3Direction *= 0.016f; //should be multiplied by the delta time
 
-	//	SetVelocity(ZERO_V3);
-	//	a_pOther->SetVelocity(ZERO_V3);
-	//}
+		ApplyForce(v3Direction);
+		a_pOther->ApplyForce(-v3Direction);
+
+		//SetVelocity(ZERO_V3);
+		//a_pOther->SetVelocity(ZERO_V3);
+	}
 }

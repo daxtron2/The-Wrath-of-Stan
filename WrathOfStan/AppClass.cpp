@@ -79,6 +79,7 @@ void Application::Display(void)
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
 	
+
 	//clear the render list
 	m_pMeshMngr->ClearRenderList();
 	
@@ -120,6 +121,7 @@ void Application::Punch(void)
 			m_pEntityMngr->AddEntity(new MyEntity(punchBox, "Punch"));
 			punchEnt = m_pEntityMngr->GetEntity();
 			m_pEntityMngr->UsePhysicsSolver(false);
+			m_pEntityMngr->SetMass(15001.f);
 		}
 		punchEnt->GetRigidBody()->SetVisibleARBB(false);
 	}
@@ -164,12 +166,16 @@ void Application::Punch(void)
 				colEntities[i]->GetRigidBody()->SetColorOutline(C_BLUE);
 				vector3 playerPos = m_pCameraMngr->GetPosition();
 				vector3 punchDir = glm::normalize(otherPos - playerPos);
-				colEntities[i]->ApplyForce(punchDir * m_fPunchForce *1000);
+				if (colEntities[i]->GetMass() < 12344.f)
+				{
+					colEntities[i]->ApplyForce(punchDir * m_fPunchForce * 3.f);
+				}
 				//std::cout << "Punch Direction: " << punchDir.x << ", " << punchDir.y << ", " << punchDir.z << std::endl;
 			}
 		}
 	}
 }
+
 void Application::SetRow(vector3 origin)
 {
 	matrix4 deg90Y = glm::rotate(glm::radians(90.0f), AXIS_Y);
@@ -246,7 +252,7 @@ void Application::SetRow(vector3 origin)
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->SetMass(.3f);
+	m_pEntityMngr->SetMass(1.f);
 
 	vector3 keyboard2Offset = vector3(.4f, 1.1f, 0.2f);
 	vector3 keyboard2Position = keyboard2Offset + origin;
@@ -282,6 +288,8 @@ void Application::SetupRoom(void)
 	matrix4 deg180X = glm::rotate(glm::radians(0.0f), AXIS_X);
 	matrix4 degN90Y = glm::rotate(glm::radians(-90.0f), AXIS_Y);
 
+	m_pMeshMngr->AddCubeToRenderList(glm::translate(vector3(0,1,0)), C_YELLOW);
+
 #pragma region Player
 	//Player
 	/*m_pEntityMngr->AddEntity("Stan\\StenPin.obj", "Player");
@@ -311,30 +319,31 @@ void Application::SetupRoom(void)
 
 #pragma endregion
 
+
 	//doesn't work right now
 #pragma region Walls and Floor
 
 	m_pEntityMngr->AddEntity("Stan\\Floor.obj", "Floor");
-	v3Position = vector3(-0.5f, 0, 4.5f);
+	v3Position = vector3(-0.5f, -0.5f, 4.5f);
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::scale(vector3(2, 1, 2));
-	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
+	//m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->SetMass(1000.f);
+	//m_pEntityMngr->SetMass(12345.f);
 
 	m_pEntityMngr->AddEntity("Stan\\Wall.obj", "LeftWall");
 	v3Position = vector3(-7.5f, 0, 5.0f);
 	m4Position = glm::translate(v3Position);
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->SetMass(1000.f);
+	m_pEntityMngr->SetMass(12345.f);
 
 	m_pEntityMngr->AddEntity("Stan\\Wall.obj", "RightWall");
 	v3Position = vector3(5.5f, 0, 5.0f);
 	m4Position = glm::translate(v3Position);
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->SetMass(1000.f);
+	m_pEntityMngr->SetMass(12345.f);
 
 	m_pEntityMngr->AddEntity("Stan\\SmWall.obj", "BackWall");
 	v3Position = vector3(-0.5f, 0, 13.8f);
@@ -342,7 +351,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * glm::scale(vector3(2, 1, 1));
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->SetMass(1000.f);
+	m_pEntityMngr->SetMass(12345.f);
 
 	m_pEntityMngr->AddEntity("Stan\\SmWall.obj", "FrontWall");
 	v3Position = vector3(-0.5f, 0, -4.0f);
@@ -350,7 +359,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * glm::scale(vector3(2, 1, 1));
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
-	m_pEntityMngr->SetMass(1000.f);
+	m_pEntityMngr->SetMass(12345.f);
 
 #pragma endregion
 
@@ -380,6 +389,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(5.f);
 
 	//Keyboards
 
@@ -389,6 +399,9 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg90Y;
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(1.f);
+
+
 
 	//Monitors
 
@@ -398,6 +411,8 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(1.f);
+
 
 	//Computer Towers
 
@@ -408,6 +423,8 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(1.5f);
+
 
 	//Chairs
 
@@ -417,6 +434,8 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * degN90Y;
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(2.5f);
+
 #pragma endregion
 
 #pragma region Back Desk
@@ -429,6 +448,7 @@ void Application::SetupRoom(void)
 	m4Position = m4Position * deg180X;
 	m_pEntityMngr->UsePhysicsSolver(m_bEnablePropPhysics);
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->SetMass(5.f);
 #pragma endregion
 	/*
 #pragma region 1st Row
