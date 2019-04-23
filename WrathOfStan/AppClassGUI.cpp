@@ -119,15 +119,18 @@ void Application::DrawGUI(void)
 {
 #pragma region Debugging Information
 	//Print info on the screen
-	uint nEmptyLines = 20;
+	uint nEmptyLines = 15;
 	for (uint i = 0; i < nEmptyLines; ++i)
 		m_pMeshMngr->PrintLine("");//Add a line on top
 	//m_pMeshMngr->Print("						");
 	m_pMeshMngr->PrintLine(m_pSystem->GetAppName(), C_YELLOW);
 	//m_pMeshMngr->Print("						");
+	m_pMeshMngr->PrintLine("Use WASD to navigate the scene");
+	m_pMeshMngr->PrintLine("Aim your punches by moving the mouse");
+	m_pMeshMngr->PrintLine("You can punch objects using LMB");
 	m_pMeshMngr->Print("Press ");
 	m_pMeshMngr->Print("SpaceBar", C_BLUE);
-	m_pMeshMngr->PrintLine(" for sound!");
+	m_pMeshMngr->PrintLine(" to throw a Stan pin");
 
 	//m_pMeshMngr->Print("						");
 	m_pMeshMngr->Print("RenderCalls: ");//Add a line on top
