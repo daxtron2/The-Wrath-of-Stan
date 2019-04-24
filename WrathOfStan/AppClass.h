@@ -48,7 +48,7 @@ private:
 	bool m_bFocused = true; //is the window focused?
 
 	float m_fMovementSpeed = 0.1f; //how fast the camera will move
-	float m_fPunchForce = 500.f; //force multiplier of punch
+	float m_fPunchForce = 1.f; //force multiplier of punch
 
 	vector3 m_v3Mouse = vector3(); //position of the mouse in the window
 	bool m_bFPC = true;// First Person Camera flag

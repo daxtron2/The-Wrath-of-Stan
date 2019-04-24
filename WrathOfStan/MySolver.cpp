@@ -63,10 +63,10 @@ void MySolver::ApplyFriction(float a_fFriction)
 		a_fFriction = 0.01f;
 
 	//there is no friction falling
-	vector3 v3Negated = vector3(m_v3Velocity.x, 0.0f, m_v3Velocity.z) * (-a_fFriction); 
+	vector3 v3Negated = vector3(m_v3Velocity.x, 0.0f, m_v3Velocity.z) * (-a_fFriction);
 	m_v3Velocity += v3Negated;
 	//m_v3Velocity *= 1.0f - a_fFriction;
-	
+
 	//if velocity is really small make it zero
 	if (glm::length(m_v3Velocity) < 0.01f)
 		m_v3Velocity = ZERO_V3;
@@ -77,7 +77,7 @@ void MySolver::ApplyForce(vector3 a_v3Force)
 	if (m_fMass < 0.01f)
 		m_fMass = 0.01f;
 	//f = m * a -> a = f / m
-	
+
 	m_v3Acceleration += a_v3Force / m_fMass;
 }
 vector3 CalculateMaxVelocity(vector3 a_v3Velocity, float maxVelocity)
@@ -105,7 +105,7 @@ void MySolver::Update(void)
 	//ApplyForce(vector3(0.0f, -0.16f, 0.0f) * m_fMass); //real world borring gravity! (9.81 * deltatime)
 
 
-	m_v3Velocity += m_v3Acceleration * .0016f;
+	m_v3Velocity += m_v3Acceleration; //* .0016f;
 
 	float fMaxVelocity = 5.0f;
 	m_v3Velocity = CalculateMaxVelocity(m_v3Velocity, fMaxVelocity);
@@ -134,14 +134,34 @@ void MySolver::ResolveCollision(MySolver* a_pOther)
 	float fMagThis = glm::length(m_v3Velocity);
 	float fMagOther = glm::length(a_pOther->m_v3Velocity);
 
+	if (this->GetMass() > 12344.f || a_pOther->GetMass() > 12344.f)
+	{
+		if (this->GetMass() > 15000.f || a_pOther->GetMass() > 15000.f)
+		{
+			return;			
+		}
+		else
+		{
+			if (this->GetMass() > 12344.f && a_pOther->GetMass() < 12344.f)
+			{
+				//a_pOther->ApplyForce(glm::normalize(-a_pOther->GetVelocity()));
+				//a_pOther->SetVelocity(-a_pOther->GetVelocity());				
+				a_pOther->SetVelocity(glm::normalize(-a_pOther->GetPosition()) * glm::length(a_pOther->GetVelocity()));
+			}
+			else if (this->GetMass() > 12344.f && a_pOther->GetMass() > 12344.f)
+			{
+				return;
+			}
+		}
+	}
+
 	//If the forces are large apply them on each other
 	if (fMagThis > REPULSIONFORCE || fMagOther > REPULSIONFORCE)
 	{
-		//a_pOther->ApplyForce(GetVelocity());
 		ApplyForce(-m_v3Velocity);
 		a_pOther->ApplyForce(m_v3Velocity);
 	}
-	else// if (fMagThis != 0 || fMagOther != 0 )//Objects are almost static but they need to be separated
+	else
 	{
 		vector3 v3Direction = m_v3Position - a_pOther->m_v3Position;
 		if (glm::length(v3Direction) != 0)
@@ -151,5 +171,8 @@ void MySolver::ResolveCollision(MySolver* a_pOther)
 
 		ApplyForce(v3Direction);
 		a_pOther->ApplyForce(-v3Direction);
+
+		//SetVelocity(ZERO_V3);
+		//a_pOther->SetVelocity(ZERO_V3);
 	}
 }

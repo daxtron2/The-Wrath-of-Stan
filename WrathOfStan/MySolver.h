@@ -20,6 +20,7 @@ namespace Simplex
 		quaternion m_qOrientation = quaternion(); //orientation of the MySolver
 		float m_fMass = 1.0f; //Mass of the solver
 		bool m_bIsCollding = false; //Is Solver colliding with any object?
+		bool m_bIsCollidingWall = false;
 	public:
 		/*
 		USAGE: Constructor
