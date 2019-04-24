@@ -18,7 +18,12 @@ void Application::ProcessMousePressed(sf::Event a_event)
 	{
 	default: break;
 	case sf::Mouse::Button::Left:
-		gui.m_bMousePressed[0] = true;		
+		gui.m_bMousePressed[0] = true;
+		if (m_bPunchedLastFrame == false)
+		{
+			m_bPunchedLastFrame = true;
+			m_bPunching = true;
+		}
 		break;
 	case sf::Mouse::Button::Middle:
 		gui.m_bMousePressed[1] = true;
@@ -444,7 +449,7 @@ void Application::ProcessKeyboard(void)
 		fMultiplier = 5.0f;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	{
+	{		
 		m_pCamera->MoveForward(m_fMovementSpeed * fMultiplier);
 		m_pCameraMngr->SetPositionTargetAndUpward(
 			m_pCamera->GetPosition(),

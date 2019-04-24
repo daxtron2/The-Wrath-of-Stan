@@ -63,6 +63,7 @@ float Simplex::MyEntity::GetMass(void)
 		return m_pSolver->GetMass();
 	return 1.0f;
 }
+
 //  MyEntity
 void Simplex::MyEntity::Init(void)
 {
@@ -123,6 +124,7 @@ Simplex::MyEntity::MyEntity(String a_sFileName, String a_sUniqueID)
 		m_bInMemory = true; //mark this entity as viable
 	}
 	m_pSolver = new MySolver();
+	m_pSolver->SetRigidbody(m_pRigidBody);
 }
 Simplex::MyEntity::MyEntity(matrix4 a_m4Object, String a_sUniqueID)
 {
@@ -157,7 +159,7 @@ Simplex::MyEntity::MyEntity(matrix4 a_m4Object, String a_sUniqueID)
 	m_bInMemory = true; //mark this entity as viable
 
 	m_pSolver = new MySolver();
-
+	m_pSolver->SetRigidbody(m_pRigidBody);
 }
 
 Simplex::MyEntity::MyEntity(MyEntity const& other)
@@ -173,6 +175,7 @@ Simplex::MyEntity::MyEntity(MyEntity const& other)
 	m_nDimensionCount = other.m_nDimensionCount;
 	m_DimensionArray = other.m_DimensionArray;
 	m_pSolver = new MySolver(*other.m_pSolver);
+	m_pSolver->SetRigidbody(m_pRigidBody);
 }
 MyEntity& Simplex::MyEntity::operator=(MyEntity const& other)
 {
