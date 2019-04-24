@@ -18,9 +18,13 @@ namespace Simplex
 		vector3 m_v3Size = vector3(1.0f); //Size of the MySolver
 		vector3 m_v3Velocity = ZERO_V3; //Velocity of the MySolver
 		quaternion m_qOrientation = quaternion(); //orientation of the MySolver
+		MyRigidBody* m_pRigidbody = nullptr;
 		float m_fMass = 1.0f; //Mass of the solver
 		bool m_bIsCollding = false; //Is Solver colliding with any object?
 		bool m_bIsCollidingWall = false;
+		bool m_bGravityApplied = false;
+		bool m_bIsOnTop = false;
+		MyRigidBody* m_pDesk = nullptr;
 	public:
 		/*
 		USAGE: Constructor
@@ -124,6 +128,12 @@ namespace Simplex
 		OUTPUT: mass of the object
 		*/
 		float GetMass(void);
+
+		void SetRigidbody(MyRigidBody * a_pRigidbody);
+
+		MyRigidBody * GetRigidBody(void);
+
+		void SetDesk(MyRigidBody * a_pDesk);
 
 		/*
 		USAGE: Applies friction to the movement

@@ -56,6 +56,13 @@ vector3 MySolver::GetVelocity(void) { return m_v3Velocity; }
 void MySolver::SetMass(float a_fMass) { m_fMass = a_fMass; }
 float MySolver::GetMass(void) { return m_fMass; }
 
+void MySolver::SetRigidbody(MyRigidBody* a_pRigidbody) { m_pRigidbody = a_pRigidbody; }
+MyRigidBody* MySolver::GetRigidBody(void) { return m_pRigidbody; }
+
+void MySolver::SetDesk(MyRigidBody* a_pDesk) {
+	m_pDesk = a_pDesk;
+}
+
 //Methods
 void MySolver::ApplyFriction(float a_fFriction)
 {
@@ -73,6 +80,7 @@ void MySolver::ApplyFriction(float a_fFriction)
 }
 void MySolver::ApplyForce(vector3 a_v3Force)
 {
+	m_bGravityApplied = true;
 	//check minimum mass
 	if (m_fMass < 0.01f)
 		m_fMass = 0.01f;
@@ -101,9 +109,9 @@ vector3 RoundSmallVelocity(vector3 a_v3Velocity, float minVelocity = 0.01f)
 void MySolver::SetIsColliding(bool a_bIsCollding) { m_bIsCollding = a_bIsCollding; }
 void MySolver::Update(void)
 {
-	ApplyForce(vector3(0.0f, -0.12f, 0.0f) * m_fMass * 9.81f);
-	//ApplyForce(vector3(0.0f, -0.16f, 0.0f) * m_fMass); //real world borring gravity! (9.81 * deltatime)
 
+	if (m_pDesk == nullptr)
+		ApplyForce(vector3(0.0f, -0.12f, 0.0f) * m_fMass * .5f);
 
 	m_v3Velocity += m_v3Acceleration; //* .0016f;
 
@@ -128,6 +136,19 @@ void MySolver::Update(void)
 
 	//m_bCanFall = true;
 	//m_bIsCollding = false;
+
+	
+
+	if (m_pDesk != nullptr) {
+		if (m_pDesk->GetMinGlobal().x > this->m_pRigidbody->GetMaxGlobal().x || m_pDesk->GetMaxGlobal().x < this->GetRigidBody()->GetMinGlobal().x) {
+			m_pDesk = nullptr;
+			return;
+		}
+		if (m_pDesk->GetMinGlobal().z > this->m_pRigidbody->GetMaxGlobal().z || m_pDesk->GetMaxGlobal().z < this->GetRigidBody()->GetMinGlobal().z) {
+			m_pDesk = nullptr;
+			return;
+		}
+	}
 }
 void MySolver::ResolveCollision(MySolver* a_pOther)
 {
@@ -138,7 +159,7 @@ void MySolver::ResolveCollision(MySolver* a_pOther)
 	{
 		if (this->GetMass() > 15000.f || a_pOther->GetMass() > 15000.f)
 		{
-			return;			
+			return;
 		}
 		else
 		{
@@ -166,7 +187,6 @@ void MySolver::ResolveCollision(MySolver* a_pOther)
 		vector3 v3Direction = m_v3Position - a_pOther->m_v3Position;
 		if (glm::length(v3Direction) != 0)
 			v3Direction = glm::normalize(v3Direction);
-		//v3Direction *= 0.04f; //should be multiplied by the delta time
 		v3Direction *= 0.016f; //should be multiplied by the delta time
 
 		ApplyForce(v3Direction);
@@ -174,5 +194,10 @@ void MySolver::ResolveCollision(MySolver* a_pOther)
 
 		//SetVelocity(ZERO_V3);
 		//a_pOther->SetVelocity(ZERO_V3);
+
+		//a_pOther->SetVelocity(m_v3Velocity);
+		//SetVelocity(ZERO_V3);
+		//m_v3Acceleration = ZERO_V3;
+
 	}
 }

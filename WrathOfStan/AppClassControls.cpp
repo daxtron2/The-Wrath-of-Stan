@@ -449,7 +449,7 @@ void Application::ProcessKeyboard(void)
 		fMultiplier = 5.0f;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	{
+	{		
 		m_pCamera->MoveForward(m_fMovementSpeed * fMultiplier);
 		m_pCameraMngr->SetPositionTargetAndUpward(
 			m_pCamera->GetPosition(),
