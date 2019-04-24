@@ -283,6 +283,7 @@ void Application::SpawnPin(void)
 {
 	MyEntity* pin = new MyEntity("Stan\\StenPin.obj", "Pin");
 	pin->UsePhysicsSolver(true);
+	pin->SetMass(10.0f);
 	pin->SetPosition(m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Front"))->GetPosition());
 	/*matrix4 pinMatrix = pin->GetModelMatrix();
 	matrix4 rotateMatrix = glm::rotate(glm::dot(m_pCamera->GetForward(), AXIS_Z), AXIS_Y);
@@ -291,7 +292,7 @@ void Application::SpawnPin(void)
 
 	m_pEntityMngr->AddEntity(pin);
 
-	pin->ApplyForce(m_pCamera->GetForward() * 500.0f);
+	pin->ApplyForce(glm::normalize(m_pCamera->GetTarget() - m_pCamera->GetPosition()) * 10.0f);
 }
 
 void Application::SetupRoom(void)

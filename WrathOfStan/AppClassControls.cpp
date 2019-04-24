@@ -449,72 +449,71 @@ void Application::ProcessKeyboard(void)
 		fMultiplier = 5.0f;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	{		
-		m_pCamera->MoveForward(m_fMovementSpeed * fMultiplier);
-		m_pCameraMngr->SetPositionTargetAndUpward(
-			m_pCamera->GetPosition(),
-			m_pCamera->GetTarget(),
-			m_pCamera->GetUpward()
-		);
-
-		//SafeDelete(m_pRoot);
-		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+	{
+		float distance = m_fMovementSpeed * fMultiplier;
+		vector3 potentialNextPosition = m_pCamera->GetPosition() + (m_pCamera->GetForward() * distance);
+		if ((potentialNextPosition.z > -7.5f && potentialNextPosition.z < 7.5f) && (potentialNextPosition.x > -7.0f && potentialNextPosition.x < 5.0f))
+		{
+			m_pCamera->MoveForward(m_fMovementSpeed * fMultiplier);
+			m_pCameraMngr->SetPositionTargetAndUpward(
+				m_pCamera->GetPosition(),
+				m_pCamera->GetTarget(),
+				m_pCamera->GetUpward()
+			);
+		}
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		m_pCamera->MoveForward(-m_fMovementSpeed * fMultiplier);
-		m_pCameraMngr->SetPositionTargetAndUpward(
-			m_pCamera->GetPosition(),
-			m_pCamera->GetTarget(),
-			m_pCamera->GetUpward()
-		);
-
-		//SafeDelete(m_pRoot);
-		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+		float distance = -m_fMovementSpeed * fMultiplier;
+		vector3 potentialNextPosition = m_pCamera->GetPosition() + (m_pCamera->GetForward() * distance);
+		if ((potentialNextPosition.z > -7.5f && potentialNextPosition.z < 7.5f) && (potentialNextPosition.x > -7.0f && potentialNextPosition.x < 5.0f))
+		{
+			m_pCamera->MoveForward(-m_fMovementSpeed * fMultiplier);
+			m_pCameraMngr->SetPositionTargetAndUpward(
+				m_pCamera->GetPosition(),
+				m_pCamera->GetTarget(),
+				m_pCamera->GetUpward()
+			);
+		}
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		m_pCamera->MoveSideways(m_fMovementSpeed * fMultiplier);
-		m_pCameraMngr->SetPositionTargetAndUpward(
-			m_pCamera->GetPosition(),
-			m_pCamera->GetTarget(),
-			m_pCamera->GetUpward()
-		);
-
-		//SafeDelete(m_pRoot);
-		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+		float distance = -m_fMovementSpeed * fMultiplier;
+		vector3 potentialNextPosition = m_pCamera->GetPosition() + (m_pCamera->GetRightward() * distance);
+		if ((potentialNextPosition.z > -7.5f && potentialNextPosition.z < 7.5f) && (potentialNextPosition.x > -7.0f && potentialNextPosition.x < 5.0f))
+		{
+			m_pCamera->MoveSideways(m_fMovementSpeed * fMultiplier);
+			m_pCameraMngr->SetPositionTargetAndUpward(
+				m_pCamera->GetPosition(),
+				m_pCamera->GetTarget(),
+				m_pCamera->GetUpward()
+			);
+		}
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		m_pCamera->MoveSideways(-m_fMovementSpeed * fMultiplier);
-		m_pCameraMngr->SetPositionTargetAndUpward(
-			m_pCamera->GetPosition(),
-			m_pCamera->GetTarget(),
-			m_pCamera->GetUpward()
-		);
-
-		//SafeDelete(m_pRoot);
-		//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+		float distance = m_fMovementSpeed * fMultiplier;
+		vector3 potentialNextPosition = m_pCamera->GetPosition() + (m_pCamera->GetRightward() * distance);
+		if ((potentialNextPosition.z > -7.5f && potentialNextPosition.z < 7.5f) && (potentialNextPosition.x > -7.0f && potentialNextPosition.x < 5.0f))
+		{
+			m_pCamera->MoveSideways(-m_fMovementSpeed * fMultiplier);
+			m_pCameraMngr->SetPositionTargetAndUpward(
+				m_pCamera->GetPosition(),
+				m_pCamera->GetTarget(),
+				m_pCamera->GetUpward()
+			);
+		}
 	}
-
-	/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-	{
-		m_pCameraMngr->MoveVertical(-m_fMovementSpeed * fMultiplier);
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-	{
-		m_pCameraMngr->MoveVertical(m_fMovementSpeed * fMultiplier);
-	}*/
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 	{
 		DeleteEntities();
 		SetupRoom();
 	}
+
 #pragma endregion
 }
 //Joystick
