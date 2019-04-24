@@ -18,7 +18,12 @@ void Application::ProcessMousePressed(sf::Event a_event)
 	{
 	default: break;
 	case sf::Mouse::Button::Left:
-		gui.m_bMousePressed[0] = true;		
+		gui.m_bMousePressed[0] = true;
+		if (m_bPunchedLastFrame == false)
+		{
+			m_bPunchedLastFrame = true;
+			m_bPunching = true;
+		}
 		break;
 	case sf::Mouse::Button::Middle:
 		gui.m_bMousePressed[1] = true;

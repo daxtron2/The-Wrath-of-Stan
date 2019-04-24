@@ -30,6 +30,8 @@ class Application
 	std::vector<MyEntity*> m_pStanPins;
 
 	MyEntity* m_pFrontEntity = nullptr;
+	MyEntity* m_pPunchEnt = nullptr;
+	uint m_uPunchEntityId = 0;
 
 private:
 	static ImGuiObject gui; //GUI object
