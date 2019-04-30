@@ -25,6 +25,8 @@ Simplex::MyOctant::MyOctant(uint a_nMaxLevel, uint a_nIdealEntityCount)
 	for (int x = 0; x < nObjects; x++)
 	{
 		MyEntity* newEntity = m_pEntityMngr->GetEntity(x);
+		if (12345.0f == newEntity->GetMass())
+			continue;
 		MyRigidBody* newRigidBody = newEntity->GetRigidBody();
 		lMinMax.push_back(newRigidBody->GetMinGlobal());
 		lMinMax.push_back(newRigidBody->GetMaxGlobal());
