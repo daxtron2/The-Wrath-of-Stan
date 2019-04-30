@@ -98,7 +98,7 @@ void Application::ProcessKeyPressed(sf::Event a_event)
 		if (m_bOctreeActive)
 			SafeDelete(m_pRoot)
 		else
-			m_pRoot = new MyOctant(m_uOctantLevels, 5);
+			m_pRoot = new MyOctant(m_uOctantLevels, m_uIdealEntityCount);
 
 		m_bOctreeActive = !m_bOctreeActive;
 		break;
