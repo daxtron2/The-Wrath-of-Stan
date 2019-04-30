@@ -347,6 +347,7 @@ void Application::SetupRoom(void)
 	m4Position = glm::translate(v3Position);
 	m4Position = m4Position * glm::scale(vector3(2, 1, 2));
 	m_pEntityMngr->SetModelMatrix(m4Position);
+	m_pEntityMngr->UsePhysicsSolver(false);
 
 	m_pEntityMngr->AddEntity("Stan\\Wall.obj", "LeftWall");
 	v3Position = vector3(-7.5f, 0, 0);

@@ -20,7 +20,9 @@ Simplex::MyOctant::MyOctant(uint a_nMaxLevel, uint a_nIdealEntityCount)
 
 	std::vector<vector3> lMinMax; //holds the min and max vectors of the bounding object
 
-	int nObjects = m_pEntityMngr->GetEntityCount();
+	lMinMax.push_back(vector3(8.0f, 5.0f, 5.0f));
+	lMinMax.push_back(vector3(-8.0f, 0.0f, -5.0f));
+	/*int nObjects = m_pEntityMngr->GetEntityCount();
 
 	for (int x = 0; x < nObjects; x++)
 	{
@@ -30,7 +32,7 @@ Simplex::MyOctant::MyOctant(uint a_nMaxLevel, uint a_nIdealEntityCount)
 		MyRigidBody* newRigidBody = newEntity->GetRigidBody();
 		lMinMax.push_back(newRigidBody->GetMinGlobal());
 		lMinMax.push_back(newRigidBody->GetMaxGlobal());
-	}
+	}*/
 	MyRigidBody* lMinMaxRigidBody = new MyRigidBody(lMinMax);
 
 	vector3 halfWidth = lMinMaxRigidBody->GetHalfWidth();

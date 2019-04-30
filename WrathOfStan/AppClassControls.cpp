@@ -96,7 +96,10 @@ void Application::ProcessKeyPressed(sf::Event a_event)
 		break;
 	case sf::Keyboard::O:
 		if (m_bOctreeActive)
-			SafeDelete(m_pRoot)
+		{
+			m_pEntityMngr->ClearDimensionSetAll();
+			SafeDelete(m_pRoot);
+		}
 		else
 			m_pRoot = new MyOctant(m_uOctantLevels, m_uIdealEntityCount);
 
@@ -165,7 +168,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 	case sf::Keyboard::RShift:
 		m_bModifier = false;
 	case sf::Keyboard::RBracket:
-		if (m_uOctantLevels < 4)
+		if (m_bOctreeActive && m_uOctantLevels < 4)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
 			++m_uOctantLevels;
@@ -174,7 +177,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		}
 		break;
 	case sf::Keyboard::LBracket:
-		if (m_uOctantLevels > 0)
+		if (m_bOctreeActive && m_uOctantLevels > 0)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
 			--m_uOctantLevels;

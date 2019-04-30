@@ -128,6 +128,8 @@ void Application::DrawGUI(void)
 	m_pMeshMngr->PrintLine("Use WASD to navigate the scene");
 	m_pMeshMngr->PrintLine("Aim your punches by moving the mouse");
 	m_pMeshMngr->PrintLine("You can punch objects using LMB");
+	m_pMeshMngr->PrintLine("Turn Octree on and off using 'O'");
+	m_pMeshMngr->PrintLine("Increase and decrease octant levels using '[' and ']'");
 	m_pMeshMngr->Print("Press ");
 	m_pMeshMngr->Print("SpaceBar", C_BLUE);
 	m_pMeshMngr->PrintLine(" to throw a Stan pin");
@@ -171,7 +173,7 @@ void Application::DrawGUI(void)
 			ImGui::Text("FrameRate: %.2f [FPS] -> %.3f [ms/frame] ",
 				ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
 			ImGui::Text("RenderCalls: %d", m_uRenderCallCount);
-			ImGui::Text("Controllers: %d", m_uControllerCount);
+			ImGui::Text("Octant Level: %d", m_uOctantLevels);
 			ImGui::Separator();
 			if (ImGui::Button("Console"))
 				m_bGUI_Console ^= 1;
