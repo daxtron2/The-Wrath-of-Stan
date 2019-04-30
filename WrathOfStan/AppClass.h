@@ -32,6 +32,7 @@ class Application
 	MyEntity* m_pFrontEntity = nullptr;
 	MyEntity* m_pPunchEnt = nullptr;
 	uint m_uPunchEntityId = 0;
+	uint m_uIdealEntityCount = 9;
 
 private:
 	static ImGuiObject gui; //GUI object

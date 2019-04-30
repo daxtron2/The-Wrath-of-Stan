@@ -23,7 +23,7 @@ void Application::InitVariables(void)
 
 	if (m_bOctreeActive)
 	{
-		m_pRoot = new MyOctant(m_uOctantLevels, 5);
+		m_pRoot = new MyOctant(m_uOctantLevels, m_uIdealEntityCount);
 		m_pEntityMngr->Update();
 	}
 }
@@ -53,7 +53,7 @@ void Application::Update(void)
 		if (static_cast<int>(fTimer) > 1.0f)
 		{
 			SafeDelete(m_pRoot);
-			m_pRoot = new MyOctant(m_uOctantLevels, 5);
+			m_pRoot = new MyOctant(m_uOctantLevels, m_uIdealEntityCount);
 			fTimer = 0;
 		}
 	}
